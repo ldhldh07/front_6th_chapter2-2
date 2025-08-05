@@ -6,7 +6,7 @@ interface CartProps {
   selectedCoupon: Coupon | null;
   updateQuantity: (productId: string, newQuantity: number) => void;
   removeFromCart: (productId: string) => void;
-  calculateItemTotal: (item: CartItem) => number;
+  calculateItemTotal: (item: CartItem, allCartItems: CartItem[]) => number;
   applyCoupon: (coupon: Coupon) => void;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   totals: {
@@ -67,7 +67,7 @@ const Cart = ({
         ) : (
           <div className="space-y-3">
             {cart.map((item) => {
-              const itemTotal = calculateItemTotal(item);
+              const itemTotal = calculateItemTotal(item, cart);
               const originalPrice = item.product.price * item.quantity;
               const hasDiscount = itemTotal < originalPrice;
               const discountRate = hasDiscount
