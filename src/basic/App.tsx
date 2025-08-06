@@ -10,6 +10,7 @@ import { useNotifications } from "./hooks/useNotifications";
 
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
+import { useDebounce } from "./utils/hooks/useDebounce";
 import { CloseIcon, CartIcon } from "./components/icons";
 
 export type NotificationType = "error" | "success" | "warning";
@@ -17,7 +18,7 @@ export type NotificationType = "error" | "success" | "warning";
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { notifications, addNotification, removeNotification } =
     useNotifications();
@@ -37,13 +38,6 @@ const App = () => {
     "coupons",
     initialCoupons
   );
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
 
   const {
     couponForm,

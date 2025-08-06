@@ -1,4 +1,3 @@
-import React from "react";
 import { ProductWithUI, formatPriceForAdmin } from "../models/product";
 
 interface ProductTableProps {
