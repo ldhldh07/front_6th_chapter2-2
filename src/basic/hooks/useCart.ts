@@ -110,7 +110,6 @@ export const useCart = () => {
     [cart]
   );
 
-  // 장바구니 총액 계산
   const calculateTotal = useCallback(
     (cartItems?: CartItem[], coupon?: Coupon | null) => {
       return calculateCartTotal(cartItems || cart, coupon || null);

@@ -15,12 +15,6 @@ import {
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { percentToDecimal } from "../utils/formatters";
 
-export interface Notification {
-  id: string;
-  message: string;
-  type: NotificationType;
-}
-
 export const useProducts = (
   initialProducts: ProductWithUI[],
   addNotification: (message: string, type?: NotificationType) => void

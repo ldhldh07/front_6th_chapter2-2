@@ -5,7 +5,8 @@ import { AdminPage } from "./components/AdminPage";
 import { initialProducts, initialCoupons } from "./constants";
 import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
-import { useProducts, Notification } from "./hooks/useProducts";
+import { useProducts } from "./hooks/useProducts";
+import { useNotifications } from "./hooks/useNotifications";
 import { formatPrice } from "./models/product";
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
@@ -15,9 +16,11 @@ export type NotificationType = "error" | "success" | "warning";
 
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  const { notifications, addNotification, removeNotification } =
+    useNotifications();
 
   const {
     cart,
@@ -41,18 +44,6 @@ const App = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  const addNotification = useCallback(
-    (message: string, type: NotificationType = "success") => {
-      const id = Date.now().toString();
-      setNotifications((prev) => [...prev, { id, message, type }]);
-
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }, 3000);
-    },
-    []
-  );
 
   const {
     couponForm,
@@ -102,24 +93,20 @@ const App = () => {
     <>
       {notifications.length > 0 && (
         <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-          {notifications.map((notif) => (
+          {notifications.map((notifications) => (
             <div
-              key={notif.id}
+              key={notifications.id}
               className={`p-4 rounded-md shadow-md text-white flex justify-between items-center ${
-                notif.type === "error"
+                notifications.type === "error"
                   ? "bg-red-600"
-                  : notif.type === "warning"
+                  : notifications.type === "warning"
                     ? "bg-yellow-600"
                     : "bg-green-600"
               }`}
             >
-              <span className="mr-2">{notif.message}</span>
+              <span className="mr-2">{notifications.message}</span>
               <button
-                onClick={() =>
-                  setNotifications((prev) =>
-                    prev.filter((n) => n.id !== notif.id)
-                  )
-                }
+                onClick={() => removeNotification(notifications.id)}
                 className="text-white hover:text-gray-200"
               >
                 <CloseIcon className="w-4 h-4" />
