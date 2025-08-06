@@ -12,7 +12,7 @@ import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
 import { CloseIcon, CartIcon } from "./components/icons";
 
-export type NotificationType = "error" | "success" | "warning";
+export type NotificationType = NotificationType;
 
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);

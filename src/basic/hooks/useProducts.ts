@@ -5,13 +5,14 @@ import {
   ProductFormData,
   createProduct,
   generateProductId,
-  addDiscountToList,
-  removeDiscountFromList,
-  updateDiscountQuantity,
-  updateDiscountRate,
   createEmptyProductForm,
   createProductFormFromProduct,
 } from "../models/product";
+import {
+  Discount,
+  addDiscountToList,
+  removeDiscountFromList,
+} from "../models/discount";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { percentToDecimal } from "../utils/formatters";
 
@@ -125,36 +126,57 @@ export const useProducts = (
   // ============================================================================
 
   /**
+   * 할인 정보 업데이트 헬퍼 함수
+   */
+  const updateDiscounts = useCallback(
+    (updater: (discounts: Discount[]) => Discount[]) => {
+      setProductForm((prev) => ({
+        ...prev,
+        discounts: updater(prev.discounts),
+      }));
+    },
+    []
+  );
+
+  /**
+   * 할인 정보 직접 설정
+   */
+  const setProductFormDiscounts = useCallback(
+    (newDiscounts: Discount[]) => {
+      updateDiscounts(() => newDiscounts);
+    },
+    [updateDiscounts]
+  );
+
+  /**
    * 할인 추가
    */
   const handleDiscountAdd = useCallback(() => {
-    setProductForm((prev) => ({
-      ...prev,
-      discounts: addDiscountToList(prev.discounts),
-    }));
-  }, []);
+    updateDiscounts(addDiscountToList);
+  }, [updateDiscounts]);
 
   /**
    * 할인 제거
    */
-  const handleDiscountRemove = useCallback((index: number) => {
-    setProductForm((prev) => ({
-      ...prev,
-      discounts: removeDiscountFromList(prev.discounts, index),
-    }));
-  }, []);
+  const handleDiscountRemove = useCallback(
+    (index: number) => {
+      updateDiscounts((discounts) => removeDiscountFromList(discounts, index));
+    },
+    [updateDiscounts]
+  );
 
   /**
    * 할인 수량 변경
    */
   const handleDiscountQuantityChange = useCallback(
     (index: number, quantity: number) => {
-      setProductForm((prev) => ({
-        ...prev,
-        discounts: updateDiscountQuantity(prev.discounts, index, quantity),
-      }));
+      updateDiscounts((discounts) =>
+        discounts.map((discount, i) =>
+          i === index ? { ...discount, quantity } : discount
+        )
+      );
     },
-    []
+    [updateDiscounts]
   );
 
   /**
@@ -162,16 +184,13 @@ export const useProducts = (
    */
   const handleDiscountRateChange = useCallback(
     (index: number, rate: number) => {
-      setProductForm((prev) => ({
-        ...prev,
-        discounts: updateDiscountRate(
-          prev.discounts,
-          index,
-          percentToDecimal(rate)
-        ),
-      }));
+      updateDiscounts((discounts) =>
+        discounts.map((discount, i) =>
+          i === index ? { ...discount, rate: percentToDecimal(rate) } : discount
+        )
+      );
     },
-    []
+    [updateDiscounts]
   );
 
   return {
@@ -192,5 +211,7 @@ export const useProducts = (
     handleDiscountRemove,
     handleDiscountQuantityChange,
     handleDiscountRateChange,
+    updateDiscounts,
+    setProductFormDiscounts,
   };
 };

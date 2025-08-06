@@ -1,5 +1,6 @@
 import { Product } from "../../types";
-import { ProductWithUI } from "./CartPage";
+import { NotificationType } from "../App";
+import { ProductWithUI } from "../models/product";
 import { ImageIcon } from "./icons";
 
 interface ProductListProps {
@@ -9,16 +10,10 @@ interface ProductListProps {
   formatPrice: (price: number, productId?: string) => string;
   addToCart: (
     product: Product,
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   getStockForProduct: (product: Product) => number;
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
 }
 
 export const ProductList = ({

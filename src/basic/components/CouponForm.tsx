@@ -5,16 +5,14 @@ import {
   processCouponForm,
   resetCouponForm,
 } from "../models/coupon";
+import { NotificationType } from "../App";
 
 interface CouponFormProps {
   showCouponForm: boolean;
   couponForm: CouponFormData;
   setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
   setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
   addCoupon: (newCoupon: Coupon) => void;
   emptyCouponForm: CouponFormData;
   coupons: Coupon[];

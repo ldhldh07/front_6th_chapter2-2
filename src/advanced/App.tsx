@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { CartItem, Coupon, Product } from "../types";
+import { NotificationType } from "../basic/App";
 
 interface ProductWithUI extends Product {
   description?: string;
@@ -9,7 +10,7 @@ interface ProductWithUI extends Product {
 interface Notification {
   id: string;
   message: string;
-  type: "error" | "success" | "warning";
+  type: NotificationType;
 }
 
 // 초기 데이터
@@ -208,7 +209,7 @@ const App = () => {
   };
 
   const addNotification = useCallback(
-    (message: string, type: "error" | "success" | "warning" = "success") => {
+    (message: string, type: NotificationType = "success") => {
       const id = Date.now().toString();
       setNotifications((prev) => [...prev, { id, message, type }]);
 

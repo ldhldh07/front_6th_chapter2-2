@@ -3,48 +3,34 @@ import Cart from "./Cart";
 import { calculateItemTotal } from "../models/cart";
 import { ProductList } from "./ProductList";
 import { ProductWithUI } from "../models/product";
+import { NotificationType } from "../App";
 
 interface CartPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
   debouncedSearchTerm: string;
   formatPrice: (price: number, productId?: string) => string;
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
   cart: CartItem[];
   selectedCoupon: Coupon | null;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   addToCart: (
     product: Product,
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (
     productId: string,
     newQuantity: number,
     products: Product[],
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   applyCoupon: (
     coupon: Coupon,
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   completeOrder: (
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   getStockForProduct: (product: Product) => number;
   calculateTotal: (

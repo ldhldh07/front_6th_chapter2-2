@@ -1,5 +1,6 @@
 import { Product } from "../../types";
 import { formatAdminPrice, formatUserPrice } from "../utils/formatters";
+import { Discount, createEmptyDiscountList } from "./discount";
 
 export interface ProductWithUI extends Product {
   description?: string;
@@ -11,58 +12,12 @@ export interface ProductFormData {
   price: number;
   stock: number;
   description: string;
-  discounts: { quantity: number; rate: number }[];
+  discounts: Discount[];
 }
 
 // ============================================================================
 // 엔티티를 다루지 않는 함수
 // ============================================================================
-
-/**
- * 기본 할인 정보 생성
- */
-const createDefaultDiscount = () => ({ quantity: 10, rate: 0.1 });
-
-/**
- * 할인 목록에 새 할인 추가
- */
-export const addDiscountToList = (
-  discounts: { quantity: number; rate: number }[]
-) => [...discounts, createDefaultDiscount()];
-
-/**
- * 할인 목록에서 특정 인덱스 할인 제거
- */
-export const removeDiscountFromList = (
-  discounts: { quantity: number; rate: number }[],
-  index: number
-) => discounts.filter((_, i) => i !== index);
-
-/**
- * 할인 목록에서 특정 인덱스의 수량 업데이트
- */
-export const updateDiscountQuantity = (
-  discounts: { quantity: number; rate: number }[],
-  index: number,
-  quantity: number
-) => {
-  const newDiscounts = [...discounts];
-  newDiscounts[index].quantity = quantity;
-  return newDiscounts;
-};
-
-/**
- * 할인 목록에서 특정 인덱스의 할인율 업데이트
- */
-export const updateDiscountRate = (
-  discounts: { quantity: number; rate: number }[],
-  index: number,
-  rate: number
-) => {
-  const newDiscounts = [...discounts];
-  newDiscounts[index].rate = rate;
-  return newDiscounts;
-};
 
 /**
  * 빈 상품 폼 데이터 생성
@@ -72,7 +27,7 @@ export const createEmptyProductForm = (): ProductFormData => ({
   price: 0,
   stock: 0,
   description: "",
-  discounts: [],
+  discounts: createEmptyDiscountList(),
 });
 
 /**
@@ -130,18 +85,6 @@ export const formatPrice = (
 // ============================================================================
 // 엔티티를 다루는 함수
 // ============================================================================
-
-/**
- * 상품 목록에서 특정 상품 업데이트
- */
-export const updateProductInList = (
-  products: ProductWithUI[],
-  productId: string,
-  updates: Partial<ProductWithUI>
-): ProductWithUI[] =>
-  products.map((product) =>
-    product.id === productId ? { ...product, ...updates } : product
-  );
 
 /**
  * 상품 목록에서 특정 상품 제거

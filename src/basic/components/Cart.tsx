@@ -1,4 +1,5 @@
 import { CartItem, Coupon, Product } from "../../types";
+import { NotificationType } from "../App";
 import { CloseIcon, ShoppingBagIcon } from "./icons";
 
 interface CartProps {
@@ -9,19 +10,13 @@ interface CartProps {
     productId: string,
     newQuantity: number,
     products: Product[],
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   removeFromCart: (productId: string) => void;
   calculateItemTotal: (item: CartItem, allCartItems: CartItem[]) => number;
   applyCoupon: (
     coupon: Coupon,
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   totals: {
@@ -29,15 +24,9 @@ interface CartProps {
     totalAfterDiscount: number;
   };
   completeOrder: (
-    addNotification: (
-      message: string,
-      type?: "error" | "success" | "warning"
-    ) => void
+    addNotification: (message: string, type?: NotificationType) => void
   ) => void;
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
   products: Product[];
 }
 

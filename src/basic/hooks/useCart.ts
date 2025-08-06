@@ -13,6 +13,7 @@ import {
 } from "../models/cart";
 import { findProductById } from "../models/product";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
+import { NotificationType } from "../App";
 
 export const useCart = () => {
   const [cart, setCart] = useLocalStorage<CartItem[]>("cart", []);
@@ -26,10 +27,7 @@ export const useCart = () => {
   const addToCart = useCallback(
     (
       product: Product,
-      addNotification: (
-        message: string,
-        type?: "error" | "success" | "warning"
-      ) => void
+      addNotification: (message: string, type?: NotificationType) => void
     ) => {
       const remainingStock = getRemainingStock(product, cart);
       if (remainingStock <= 0) {
@@ -63,10 +61,7 @@ export const useCart = () => {
       productId: string,
       newQuantity: number,
       products: Product[],
-      addNotification: (
-        message: string,
-        type?: "error" | "success" | "warning"
-      ) => void
+      addNotification: (message: string, type?: NotificationType) => void
     ) => {
       if (newQuantity <= 0) {
         setCart(removeItemFromCart(cart, productId));
@@ -87,13 +82,8 @@ export const useCart = () => {
   );
 
   const completeOrder = useCallback(
-    (
-      addNotification: (
-        message: string,
-        type?: "error" | "success" | "warning"
-      ) => void
-    ) => {
-      const orderNumber = generateOrderNumber();
+    (addNotification: (message: string, type?: NotificationType) => void) => {
+      const orderNumber = generateOrderNumber(Date.now());
       addNotification(
         `주문이 완료되었습니다. 주문번호: ${orderNumber}`,
         "success"
