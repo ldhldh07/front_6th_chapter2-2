@@ -264,14 +264,6 @@ export const findCartItemByProductId = (
 ): CartItem | undefined => cart.find((item) => item.product.id === productId);
 
 /**
- * 상품 목록에서 특정 상품 찾기
- */
-export const findProductById = (
-  products: Product[],
-  productId: string
-): Product | undefined => products.find((product) => product.id === productId);
-
-/**
  * 쿠폰 사용 조건 검증
  */
 export const isCouponUsageValid = (

@@ -11,8 +11,8 @@ import {
   isStockExceeded,
   isCouponUsageValid,
   findCartItemByProductId,
-  findProductById,
 } from "../models/cart";
+import { findProductById } from "../models/product";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 
 export const useCart = () => {
