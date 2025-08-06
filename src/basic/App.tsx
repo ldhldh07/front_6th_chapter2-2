@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { Coupon } from "../types";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
@@ -7,11 +7,11 @@ import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
 import { useProducts } from "./hooks/useProducts";
 import { useNotifications } from "./hooks/useNotifications";
-
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
 import { useDebounce } from "./utils/hooks/useDebounce";
-import { CloseIcon, CartIcon } from "./components/icons";
+import { CartIcon } from "./components/icons";
+import { ToastContainer } from "./components/ui";
 
 export type NotificationType = "error" | "success" | "warning";
 
@@ -78,30 +78,10 @@ const App = () => {
 
   return (
     <>
-      {notifications.length > 0 && (
-        <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-          {notifications.map((notifications) => (
-            <div
-              key={notifications.id}
-              className={`p-4 rounded-md shadow-md text-white flex justify-between items-center ${
-                notifications.type === "error"
-                  ? "bg-red-600"
-                  : notifications.type === "warning"
-                    ? "bg-yellow-600"
-                    : "bg-green-600"
-              }`}
-            >
-              <span className="mr-2">{notifications.message}</span>
-              <button
-                onClick={() => removeNotification(notifications.id)}
-                className="text-white hover:text-gray-200"
-              >
-                <CloseIcon className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <ToastContainer
+        notifications={notifications}
+        onRemoveNotification={removeNotification}
+      />
 
       <header className="bg-white shadow-sm sticky top-0 z-40 border-b">
         <div className="max-w-7xl mx-auto px-4">
