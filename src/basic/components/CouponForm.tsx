@@ -6,6 +6,11 @@ import {
   resetCouponForm,
 } from "../models/coupon";
 import { NotificationType } from "../App";
+import {
+  isValidDiscountValue,
+  safeParseInt,
+  extractNumbers,
+} from "../utils/validators";
 
 interface CouponFormProps {
   showCouponForm: boolean;
@@ -49,32 +54,38 @@ export const CouponForm = ({
   };
 
   const handleDiscountValueBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 0;
-    if (couponForm.discountType === "percentage") {
-      if (value > 100) {
-        addNotification("할인율은 100%를 초과할 수 없습니다", "error");
-        setCouponForm({
-          ...couponForm,
-          discountValue: 100,
-        });
-      } else if (value < 0) {
-        setCouponForm({
-          ...couponForm,
-          discountValue: 0,
-        });
-      }
-    } else {
-      if (value > 100000) {
-        addNotification("할인 금액은 100,000원을 초과할 수 없습니다", "error");
-        setCouponForm({
-          ...couponForm,
-          discountValue: 100000,
-        });
-      } else if (value < 0) {
-        setCouponForm({
-          ...couponForm,
-          discountValue: 0,
-        });
+    const value = safeParseInt(e.target.value);
+
+    if (!isValidDiscountValue(value, couponForm.discountType)) {
+      if (couponForm.discountType === "percentage") {
+        if (value > 100) {
+          addNotification("할인율은 100%를 초과할 수 없습니다", "error");
+          setCouponForm({
+            ...couponForm,
+            discountValue: 100,
+          });
+        } else if (value < 0) {
+          setCouponForm({
+            ...couponForm,
+            discountValue: 0,
+          });
+        }
+      } else {
+        if (value > 100000) {
+          addNotification(
+            "할인 금액은 100,000원을 초과할 수 없습니다",
+            "error"
+          );
+          setCouponForm({
+            ...couponForm,
+            discountValue: 100000,
+          });
+        } else if (value < 0) {
+          setCouponForm({
+            ...couponForm,
+            discountValue: 0,
+          });
+        }
       }
     }
   };
@@ -153,10 +164,11 @@ export const CouponForm = ({
               }
               onChange={(e) => {
                 const value = e.target.value;
-                if (value === "" || /^\d+$/.test(value)) {
+                const numbersOnly = extractNumbers(value);
+                if (value === "" || value === numbersOnly) {
                   setCouponForm({
                     ...couponForm,
-                    discountValue: value === "" ? 0 : parseInt(value),
+                    discountValue: safeParseInt(value),
                   });
                 }
               }}

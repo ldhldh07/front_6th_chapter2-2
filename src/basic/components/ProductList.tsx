@@ -2,6 +2,7 @@ import { Product } from "../../types";
 import { NotificationType } from "../App";
 import { ProductWithUI, formatPriceForUser } from "../models/product";
 import { ImageIcon } from "./icons";
+import { getStockStatus } from "../utils/validators";
 
 interface ProductListProps {
   products: ProductWithUI[];
@@ -39,6 +40,7 @@ export const ProductList = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((product) => {
             const remainingStock = getStockForProduct(product);
+            const stockStatus = getStockStatus(remainingStock);
             return (
               <div
                 key={product.id}
@@ -88,12 +90,12 @@ export const ProductList = ({
 
                   {/* 재고 상태 */}
                   <div className="mb-3">
-                    {remainingStock <= 5 && remainingStock > 0 && (
+                    {stockStatus === "lowStock" && (
                       <p className="text-xs text-red-600 font-medium">
                         품절임박! {remainingStock}개 남음
                       </p>
                     )}
-                    {remainingStock > 5 && (
+                    {stockStatus === "inStock" && (
                       <p className="text-xs text-gray-500">
                         재고 {remainingStock}개
                       </p>
@@ -103,14 +105,14 @@ export const ProductList = ({
                   {/* 장바구니 버튼 */}
                   <button
                     onClick={() => addToCart(product, addNotification)}
-                    disabled={remainingStock <= 0}
+                    disabled={stockStatus === "soldOut"}
                     className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
-                      remainingStock <= 0
+                      stockStatus === "soldOut"
                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                         : "bg-gray-900 text-white hover:bg-gray-800"
                     }`}
                   >
-                    {remainingStock <= 0 ? "품절" : "장바구니 담기"}
+                    {stockStatus === "soldOut" ? "품절" : "장바구니 담기"}
                   </button>
                 </div>
               </div>

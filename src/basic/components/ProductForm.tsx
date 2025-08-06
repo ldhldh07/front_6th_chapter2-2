@@ -2,6 +2,12 @@ import React from "react";
 import { NotificationType } from "../App";
 import { ProductFormData } from "../models/product";
 import { CloseIcon } from "./icons";
+import {
+  isValidPrice,
+  isValidStock,
+  safeParseInt,
+  extractNumbers,
+} from "../utils/validators";
 
 interface ProductFormProps {
   showProductForm: boolean;
@@ -85,18 +91,21 @@ export const ProductForm = ({
               value={productForm.price === 0 ? "" : productForm.price}
               onChange={(e) => {
                 const value = e.target.value;
-                if (value === "" || /^\d+$/.test(value)) {
+                const numbersOnly = extractNumbers(value);
+                if (value === "" || value === numbersOnly) {
                   setProductForm({
                     ...productForm,
-                    price: value === "" ? 0 : parseInt(value),
+                    price: safeParseInt(value),
                   });
                 }
               }}
               onBlur={(e) => {
                 const value = e.target.value;
+                const parsedPrice = safeParseInt(value);
+
                 if (value === "") {
                   setProductForm({ ...productForm, price: 0 });
-                } else if (parseInt(value) < 0) {
+                } else if (!isValidPrice(parsedPrice)) {
                   addNotification("가격은 0보다 커야 합니다", "error");
                   setProductForm({ ...productForm, price: 0 });
                 }
@@ -115,26 +124,31 @@ export const ProductForm = ({
               value={productForm.stock === 0 ? "" : productForm.stock}
               onChange={(e) => {
                 const value = e.target.value;
-                if (value === "" || /^\d+$/.test(value)) {
+                const numbersOnly = extractNumbers(value);
+                if (value === "" || value === numbersOnly) {
                   setProductForm({
                     ...productForm,
-                    stock: value === "" ? 0 : parseInt(value),
+                    stock: safeParseInt(value),
                   });
                 }
               }}
               onBlur={(e) => {
                 const value = e.target.value;
+                const parsedStock = safeParseInt(value);
+
                 if (value === "") {
                   setProductForm({ ...productForm, stock: 0 });
-                } else if (parseInt(value) < 0) {
-                  addNotification("재고는 0보다 커야 합니다", "error");
-                  setProductForm({ ...productForm, stock: 0 });
-                } else if (parseInt(value) > 9999) {
-                  addNotification(
-                    "재고는 9999개를 초과할 수 없습니다",
-                    "error"
-                  );
-                  setProductForm({ ...productForm, stock: 9999 });
+                } else if (!isValidStock(parsedStock)) {
+                  if (parsedStock < 0) {
+                    addNotification("재고는 0보다 커야 합니다", "error");
+                    setProductForm({ ...productForm, stock: 0 });
+                  } else if (parsedStock > 9999) {
+                    addNotification(
+                      "재고는 9999개를 초과할 수 없습니다",
+                      "error"
+                    );
+                    setProductForm({ ...productForm, stock: 9999 });
+                  }
                 }
               }}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"
@@ -159,7 +173,7 @@ export const ProductForm = ({
                   onChange={(e) =>
                     handleDiscountQuantityChange(
                       index,
-                      parseInt(e.target.value) || 0
+                      safeParseInt(e.target.value)
                     )
                   }
                   className="w-20 px-2 py-1 border rounded"
@@ -173,7 +187,7 @@ export const ProductForm = ({
                   onChange={(e) =>
                     handleDiscountRateChange(
                       index,
-                      parseInt(e.target.value) || 0
+                      safeParseInt(e.target.value)
                     )
                   }
                   className="w-16 px-2 py-1 border rounded"

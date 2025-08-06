@@ -1,6 +1,7 @@
 import { Product } from "../../types";
 import { formatAdminPrice, formatUserPrice } from "../utils/formatters";
 import { Discount, createEmptyDiscountList } from "./discount";
+import { getStockStatus } from "../utils/validators";
 
 export interface ProductWithUI extends Product {
   description?: string;
@@ -52,15 +53,10 @@ export const findProductById = (
 ): Product | undefined => products.find((product) => product.id === productId);
 
 /**
- * 상품이 품절인지 확인
- */
-const isSoldOut = (productStock: number): boolean => productStock <= 0;
-
-/**
  * 관리자용 가격 포맷팅 (원 단위)
  */
 export const formatPriceForAdmin = (product: ProductWithUI): string => {
-  if (isSoldOut(product.stock)) return "SOLD OUT";
+  if (getStockStatus(product.stock) === "soldOut") return "SOLD OUT";
   return formatAdminPrice(product.price);
 };
 
@@ -68,7 +64,7 @@ export const formatPriceForAdmin = (product: ProductWithUI): string => {
  * 사용자용 가격 포맷팅 (₩ 기호)
  */
 export const formatPriceForUser = (product: ProductWithUI): string => {
-  if (isSoldOut(product.stock)) return "SOLD OUT";
+  if (getStockStatus(product.stock) === "soldOut") return "SOLD OUT";
   return formatUserPrice(product.price);
 };
 
