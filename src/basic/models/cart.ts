@@ -68,6 +68,17 @@ const getMaxApplicableDiscount = (
   return baseDiscount;
 };
 
+/**
+ * 전체 가격에 할인율 적용
+ */
+
+export const applyDiscountPercentToTotal = (
+  price: number,
+  quantity: number,
+  discountRate: number
+) => Math.round(price * quantity * (1 - discountRate));
+
+
 // ============================================================================
 // 엔티티를 다루는 함수
 // ============================================================================
@@ -77,7 +88,7 @@ const getMaxApplicableDiscount = (
  */
 const hasBulkPurchase = (
   cartItems: CartItem[],
-  bulkThreshold: number = 10
+  bulkThreshold: number
 ): boolean => cartItems.some((cartItem) => cartItem.quantity >= bulkThreshold);
 
 /**
@@ -132,17 +143,19 @@ export const calculateItemTotal = (
 
   const discount = getMaxApplicableDiscount(
     baseDiscount,
-    hasBulkPurchase(allCartItems)
+    hasBulkPurchase(allCartItems, 10)
   );
 
-  return Math.round(price * quantity * (1 - discount));
+  return applyDiscountPercentToTotal(price, quantity, discount);
 };
+
 
 /**
  * 할인 전 총액 계산
  */
 export const calculateSubtotal = (cart: CartItem[]): number =>
-  cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  cart.reduce((total, item) => 
+    total + applyDiscountPercentToTotal(item.product.price, item.quantity, 0), 0);
 
 /**
  * 할인 후 총액 계산
