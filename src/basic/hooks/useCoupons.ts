@@ -4,8 +4,7 @@ import { NotificationType } from "../App";
 import {
   CouponFormData,
   createEmptyCouponForm,
-  isDuplicateCouponCode,
-  isCouponUsageValid,
+  validateCouponApplication,
   removeCouponFromList,
   addCouponToList,
 } from "../models/coupon";
@@ -36,10 +35,6 @@ export const useCoupons = ({
 
   const addCoupon = useCallback(
     (newCoupon: Coupon) => {
-      if (isDuplicateCouponCode(coupons, newCoupon.code)) {
-        addNotification("이미 존재하는 쿠폰 코드입니다.", "error");
-        return;
-      }
       onUpdateCoupons(addCouponToList(coupons, newCoupon));
       addNotification("쿠폰이 추가되었습니다.", "success");
     },
@@ -61,11 +56,10 @@ export const useCoupons = ({
         selectedCoupon
       ).totalAfterDiscount;
 
-      if (!isCouponUsageValid(currentTotal, coupon.discountType)) {
-        addNotification(
-          "percentage 쿠폰은 10,000원 이상 구매 시 사용 가능합니다.",
-          "error"
-        );
+      const validation = validateCouponApplication(currentTotal, coupon);
+
+      if (!validation.valid) {
+        addNotification(validation.message!, "error");
         return;
       }
 

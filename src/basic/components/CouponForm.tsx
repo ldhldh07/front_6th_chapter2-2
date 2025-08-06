@@ -1,33 +1,52 @@
 import React from "react";
-
-interface CouponFormData {
-  name: string;
-  code: string;
-  discountType: "amount" | "percentage";
-  discountValue: number;
-}
+import { Coupon } from "../../types";
+import {
+  CouponFormData,
+  processCouponForm,
+  resetCouponForm,
+} from "../models/coupon";
 
 interface CouponFormProps {
   showCouponForm: boolean;
   couponForm: CouponFormData;
   setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
-  handleCouponSubmit: (e: React.FormEvent) => void;
   setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
   addNotification: (
     message: string,
     type?: "error" | "success" | "warning"
   ) => void;
+  addCoupon: (newCoupon: Coupon) => void;
+  emptyCouponForm: CouponFormData;
+  coupons: Coupon[];
 }
 
 export const CouponForm = ({
   showCouponForm,
   couponForm,
   setCouponForm,
-  handleCouponSubmit,
   setShowCouponForm,
   addNotification,
+  addCoupon,
+  coupons,
 }: CouponFormProps) => {
-  const handleCancelClick = () => {
+  const handleCouponSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const result = processCouponForm(coupons, couponForm);
+
+    if (!result.success) {
+      addNotification(result.message, "error");
+      return;
+    }
+
+    addCoupon(result.coupon!);
+
+    setCouponForm(resetCouponForm());
+    setShowCouponForm(false);
+  };
+
+  const handleCouponCancel = () => {
+    setCouponForm(resetCouponForm());
     setShowCouponForm(false);
   };
 
@@ -153,7 +172,7 @@ export const CouponForm = ({
         <div className="flex justify-end gap-3">
           <button
             type="button"
-            onClick={handleCancelClick}
+            onClick={handleCouponCancel}
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             취소

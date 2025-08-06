@@ -69,13 +69,6 @@ export const AdminPage = ({
     "products"
   );
 
-  const handleCouponSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    addCoupon(couponForm);
-    setCouponForm(emptyCouponForm);
-    setShowCouponForm(false);
-  };
-
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
@@ -164,9 +157,11 @@ export const AdminPage = ({
                 showCouponForm={showCouponForm}
                 couponForm={couponForm}
                 setCouponForm={setCouponForm}
-                handleCouponSubmit={handleCouponSubmit}
                 setShowCouponForm={setShowCouponForm}
                 addNotification={addNotification}
+                addCoupon={addCoupon}
+                emptyCouponForm={emptyCouponForm}
+                coupons={coupons}
               />
             </div>
           </section>
