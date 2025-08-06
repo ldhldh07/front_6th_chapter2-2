@@ -9,7 +9,6 @@ interface CartPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
   debouncedSearchTerm: string;
-  formatPrice: (price: number, productId?: string) => string;
   addNotification: (message: string, type?: NotificationType) => void;
   cart: CartItem[];
   selectedCoupon: Coupon | null;
@@ -46,7 +45,6 @@ export const CartPage = ({
   products,
   coupons,
   debouncedSearchTerm,
-  formatPrice,
   addNotification,
   cart,
   selectedCoupon,
@@ -81,7 +79,6 @@ export const CartPage = ({
           products={products}
           filteredProducts={filteredProducts}
           debouncedSearchTerm={debouncedSearchTerm}
-          formatPrice={formatPrice}
           addToCart={addToCart}
           getStockForProduct={getStockForProduct}
           addNotification={addNotification}

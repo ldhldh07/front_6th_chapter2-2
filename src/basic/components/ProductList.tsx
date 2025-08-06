@@ -1,13 +1,12 @@
 import { Product } from "../../types";
 import { NotificationType } from "../App";
-import { ProductWithUI } from "../models/product";
+import { ProductWithUI, formatPriceForUser } from "../models/product";
 import { ImageIcon } from "./icons";
 
 interface ProductListProps {
   products: ProductWithUI[];
   filteredProducts: ProductWithUI[];
   debouncedSearchTerm: string;
-  formatPrice: (price: number, productId?: string) => string;
   addToCart: (
     product: Product,
     addNotification: (message: string, type?: NotificationType) => void
@@ -20,7 +19,6 @@ export const ProductList = ({
   products,
   filteredProducts,
   debouncedSearchTerm,
-  formatPrice,
   addToCart,
   getStockForProduct,
   addNotification,
@@ -78,7 +76,7 @@ export const ProductList = ({
                   {/* 가격 정보 */}
                   <div className="mb-3">
                     <p className="text-lg font-bold text-gray-900">
-                      {formatPrice(product.price, product.id)}
+                      {formatPriceForUser(product)}
                     </p>
                     {product.discounts.length > 0 && (
                       <p className="text-xs text-gray-500">

@@ -7,12 +7,12 @@ import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
 import { useProducts } from "./hooks/useProducts";
 import { useNotifications } from "./hooks/useNotifications";
-import { formatPrice } from "./models/product";
+
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
 import { CloseIcon, CartIcon } from "./components/icons";
 
-export type NotificationType = NotificationType;
+export type NotificationType = "error" | "success" | "warning";
 
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -81,13 +81,6 @@ const App = () => {
     handleDiscountQuantityChange,
     handleDiscountRateChange,
   } = useProducts(initialProducts, addNotification);
-
-  const formatPriceWrapper = useCallback(
-    (price: number, productId?: string): string => {
-      return formatPrice(price, productId, products, isAdmin);
-    },
-    [products, isAdmin]
-  );
 
   return (
     <>
@@ -163,7 +156,6 @@ const App = () => {
           <AdminPage
             products={products}
             coupons={coupons}
-            formatPrice={formatPriceWrapper}
             addNotification={addNotification}
             couponForm={couponForm}
             setCouponForm={setCouponForm}
@@ -194,7 +186,6 @@ const App = () => {
             products={products}
             coupons={coupons}
             debouncedSearchTerm={debouncedSearchTerm}
-            formatPrice={formatPriceWrapper}
             addNotification={addNotification}
             cart={cart}
             selectedCoupon={selectedCoupon}

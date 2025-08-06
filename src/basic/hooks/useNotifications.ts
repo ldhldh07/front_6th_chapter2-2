@@ -34,7 +34,6 @@ export const useNotifications = (): UseNotificationsReturn => {
 
       setNotifications((prev) => [...prev, newNotification]);
 
-      // 3초 후 자동 삭제
       setTimeout(() => {
         setNotifications((prev) => prev.filter((n) => n.id !== id));
       }, 3000);

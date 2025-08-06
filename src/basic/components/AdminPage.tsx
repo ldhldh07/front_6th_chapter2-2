@@ -11,7 +11,6 @@ import { CouponFormData } from "../models/coupon";
 interface AdminPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
-  formatPrice: (price: number, productId?: string) => string;
   addNotification: (message: string, type?: NotificationType) => void;
   couponForm: CouponFormData;
   setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
@@ -41,7 +40,6 @@ interface AdminPageProps {
 export const AdminPage = ({
   products,
   coupons,
-  formatPrice,
   addNotification,
   couponForm,
   setCouponForm,
@@ -120,7 +118,6 @@ export const AdminPage = ({
 
             <ProductTable
               products={products}
-              formatPrice={formatPrice}
               startEditProduct={startEditProduct}
               deleteProduct={deleteProduct}
             />

@@ -1,16 +1,14 @@
 import React from "react";
-import { ProductWithUI } from "../models/product";
+import { ProductWithUI, formatPriceForAdmin } from "../models/product";
 
 interface ProductTableProps {
   products: ProductWithUI[];
-  formatPrice: (price: number, productId?: string) => string;
   startEditProduct: (product: ProductWithUI) => void;
   deleteProduct: (productId: string) => void;
 }
 
 export const ProductTable = ({
   products,
-  formatPrice,
   startEditProduct,
   deleteProduct,
 }: ProductTableProps) => {
@@ -43,7 +41,7 @@ export const ProductTable = ({
                 {product.name}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {formatPrice(product.price, product.id)}
+                {formatPriceForAdmin(product)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <span

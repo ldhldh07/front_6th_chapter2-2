@@ -78,7 +78,6 @@ export const applyDiscountPercentToTotal = (
   discountRate: number
 ) => Math.round(price * quantity * (1 - discountRate));
 
-
 // ============================================================================
 // 엔티티를 다루는 함수
 // ============================================================================
@@ -149,13 +148,15 @@ export const calculateItemTotal = (
   return applyDiscountPercentToTotal(price, quantity, discount);
 };
 
-
 /**
  * 할인 전 총액 계산
  */
 export const calculateSubtotal = (cart: CartItem[]): number =>
-  cart.reduce((total, item) => 
-    total + applyDiscountPercentToTotal(item.product.price, item.quantity, 0), 0);
+  cart.reduce(
+    (total, item) =>
+      total + applyDiscountPercentToTotal(item.product.price, item.quantity, 0),
+    0
+  );
 
 /**
  * 할인 후 총액 계산

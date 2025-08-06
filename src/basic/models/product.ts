@@ -54,32 +54,22 @@ export const findProductById = (
 /**
  * 상품이 품절인지 확인
  */
-const isSoldOut = (
-  productId: string | undefined,
-  products: ProductWithUI[]
-): boolean => {
-  if (!productId) return false;
-  const product = findProductById(products, productId);
-  return product ? product.stock <= 0 : false;
-};
+const isSoldOut = (productStock: number): boolean => productStock <= 0;
+
 /**
- * 가격 포맷팅
+ * 관리자용 가격 포맷팅 (원 단위)
  */
-export const formatPrice = (
-  price: number,
-  productId: string | undefined,
-  products: ProductWithUI[],
-  isAdmin: boolean
-): string => {
-  if (isSoldOut(productId, products)) {
-    return "SOLD OUT";
-  }
+export const formatPriceForAdmin = (product: ProductWithUI): string => {
+  if (isSoldOut(product.stock)) return "SOLD OUT";
+  return formatAdminPrice(product.price);
+};
 
-  if (isAdmin) {
-    return formatAdminPrice(price);
-  }
-
-  return formatUserPrice(price);
+/**
+ * 사용자용 가격 포맷팅 (₩ 기호)
+ */
+export const formatPriceForUser = (product: ProductWithUI): string => {
+  if (isSoldOut(product.stock)) return "SOLD OUT";
+  return formatUserPrice(product.price);
 };
 
 // ============================================================================
