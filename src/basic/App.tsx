@@ -17,8 +17,19 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
-  // 장바구니 로직을 Hook으로 분리
-  const { cart, setCart, totalItemCount } = useCart();
+  const {
+    cart,
+    cartItemCount,
+    selectedCoupon,
+    setSelectedCoupon,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    applyCoupon,
+    completeOrder,
+    getStockForProduct,
+    calculateTotal,
+  } = useCart();
 
   const [products, setProducts] = useState<ProductWithUI[]>(() => {
     const saved = localStorage.getItem("products");
@@ -75,7 +86,6 @@ const App = () => {
     if (productId) {
       const product = products.find((p) => p.id === productId);
       if (product) {
-        // 재고 체크를 위해 간단한 로직 (CartPage에서 더 정확히 계산)
         if (product.stock <= 0) {
           return "SOLD OUT";
         }
@@ -177,7 +187,7 @@ const App = () => {
                   </svg>
                   {cart.length > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {totalItemCount}
+                      {cartItemCount}
                     </span>
                   )}
                 </div>
@@ -200,11 +210,19 @@ const App = () => {
           <CartPage
             products={products}
             coupons={coupons}
-            cart={cart}
-            setCart={setCart}
             debouncedSearchTerm={debouncedSearchTerm}
             formatPrice={formatPrice}
             addNotification={addNotification}
+            cart={cart}
+            selectedCoupon={selectedCoupon}
+            setSelectedCoupon={setSelectedCoupon}
+            addToCart={addToCart}
+            removeFromCart={removeFromCart}
+            updateQuantity={updateQuantity}
+            applyCoupon={applyCoupon}
+            completeOrder={completeOrder}
+            getStockForProduct={getStockForProduct}
+            calculateTotal={calculateTotal}
           />
         )}
       </main>

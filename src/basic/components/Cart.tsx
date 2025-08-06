@@ -1,19 +1,43 @@
-import { CartItem, Coupon } from "../../types";
+import { CartItem, Coupon, Product } from "../../types";
 
 interface CartProps {
   cart: CartItem[];
   coupons: Coupon[];
   selectedCoupon: Coupon | null;
-  updateQuantity: (productId: string, newQuantity: number) => void;
+  updateQuantity: (
+    productId: string,
+    newQuantity: number,
+    products: Product[],
+    addNotification: (
+      message: string,
+      type?: "error" | "success" | "warning"
+    ) => void
+  ) => void;
   removeFromCart: (productId: string) => void;
   calculateItemTotal: (item: CartItem, allCartItems: CartItem[]) => number;
-  applyCoupon: (coupon: Coupon) => void;
+  applyCoupon: (
+    coupon: Coupon,
+    addNotification: (
+      message: string,
+      type?: "error" | "success" | "warning"
+    ) => void
+  ) => void;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   totals: {
     totalBeforeDiscount: number;
     totalAfterDiscount: number;
   };
-  completeOrder: () => void;
+  completeOrder: (
+    addNotification: (
+      message: string,
+      type?: "error" | "success" | "warning"
+    ) => void
+  ) => void;
+  addNotification: (
+    message: string,
+    type?: "error" | "success" | "warning"
+  ) => void;
+  products: Product[];
 }
 
 const Cart = ({
@@ -27,6 +51,8 @@ const Cart = ({
   setSelectedCoupon,
   totals,
   completeOrder,
+  addNotification,
+  products,
 }: CartProps) => {
   return (
     <>
@@ -106,7 +132,12 @@ const Cart = ({
                     <div className="flex items-center">
                       <button
                         onClick={() =>
-                          updateQuantity(item.product.id, item.quantity - 1)
+                          updateQuantity(
+                            item.product.id,
+                            item.quantity - 1,
+                            products,
+                            addNotification
+                          )
                         }
                         className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                       >
@@ -117,7 +148,12 @@ const Cart = ({
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.product.id, item.quantity + 1)
+                          updateQuantity(
+                            item.product.id,
+                            item.quantity + 1,
+                            products,
+                            addNotification
+                          )
                         }
                         className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                       >
@@ -157,7 +193,7 @@ const Cart = ({
                 value={selectedCoupon?.code || ""}
                 onChange={(e) => {
                   const coupon = coupons.find((c) => c.code === e.target.value);
-                  if (coupon) applyCoupon(coupon);
+                  if (coupon) applyCoupon(coupon, addNotification);
                   else setSelectedCoupon(null);
                 }}
               >
@@ -205,7 +241,7 @@ const Cart = ({
             </div>
 
             <button
-              onClick={completeOrder}
+              onClick={() => completeOrder(addNotification)}
               className="w-full mt-4 py-3 bg-yellow-400 text-gray-900 rounded-md font-medium hover:bg-yellow-500 transition-colors"
             >
               {totals.totalAfterDiscount.toLocaleString()}원 결제하기

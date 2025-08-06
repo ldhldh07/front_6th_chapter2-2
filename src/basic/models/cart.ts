@@ -57,6 +57,17 @@ const applyPercentageDiscount = (
 const calculateRemainingStock = (stock: number, usedQuantity: number): number =>
   stock - usedQuantity;
 
+/**
+ * 주문번호 생성
+ */
+export const generateOrderNumber = (): string => `ORD-${Date.now()}`;
+
+/**
+ * 재고 초과 검증
+ */
+export const isStockExceeded = (quantity: number, stock: number): boolean =>
+  quantity > stock;
+
 // ============================================================================
 // 엔티티를 다루는 함수
 // ============================================================================
@@ -243,3 +254,33 @@ export const getRemainingStock = (
   const usedQuantity = cartItem?.quantity || 0;
   return calculateRemainingStock(product.stock, usedQuantity);
 };
+
+/**
+ * 장바구니에서 특정 상품 찾기
+ */
+export const findCartItemByProductId = (
+  cart: CartItem[],
+  productId: string
+): CartItem | undefined => cart.find((item) => item.product.id === productId);
+
+/**
+ * 상품 목록에서 특정 상품 찾기
+ */
+export const findProductById = (
+  products: Product[],
+  productId: string
+): Product | undefined => products.find((product) => product.id === productId);
+
+/**
+ * 쿠폰 사용 조건 검증
+ */
+export const isCouponUsageValid = (
+  total: number,
+  couponType: string
+): boolean => !(total < 10000 && couponType === "percentage");
+
+/**
+ * 장바구니 총 아이템 개수 계산
+ */
+export const calculateTotalItemCount = (cart: CartItem[]): number =>
+  cart.reduce((sum, item) => sum + item.quantity, 0);
