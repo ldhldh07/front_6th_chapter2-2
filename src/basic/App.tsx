@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import { CartItem, Coupon } from "../types";
+import { Coupon } from "../types";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
 import { initialProducts, initialCoupons, ProductWithUI } from "./constants";
+import { useCart } from "./hooks/useCart";
 
 interface Notification {
   id: string;
@@ -15,19 +16,9 @@ const App = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [totalItemCount, setTotalItemCount] = useState(0);
 
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  // 장바구니 로직을 Hook으로 분리
+  const { cart, setCart, totalItemCount } = useCart();
 
   const [products, setProducts] = useState<ProductWithUI[]>(() => {
     const saved = localStorage.getItem("products");
@@ -60,19 +51,6 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem("coupons", JSON.stringify(coupons));
   }, [coupons]);
-
-  useEffect(() => {
-    if (cart.length > 0) {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    } else {
-      localStorage.removeItem("cart");
-    }
-  }, [cart]);
-
-  useEffect(() => {
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-    setTotalItemCount(count);
-  }, [cart]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
