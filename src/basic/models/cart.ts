@@ -45,13 +45,28 @@ const calculateRemainingStock = (stock: number, usedQuantity: number): number =>
 /**
  * 주문번호 생성
  */
-export const generateOrderNumber = (): string => `ORD-${Date.now()}`;
+export const generateOrderNumber = (date: number): string => `ORD-${date}`;
 
 /**
  * 재고 초과 검증
  */
 export const isStockExceeded = (quantity: number, stock: number): boolean =>
   quantity > stock;
+
+/**
+ * 적용 가능한 최대 할인율 계산
+ */
+const getMaxApplicableDiscount = (
+  baseDiscount: number,
+  hasBulkPurchase: boolean
+): number => {
+  if (hasBulkPurchase) {
+    const bulkDiscount = calculateBulkDiscount(baseDiscount);
+    return applyDiscountCap(bulkDiscount);
+  }
+
+  return baseDiscount;
+};
 
 // ============================================================================
 // 엔티티를 다루는 함수
@@ -104,35 +119,21 @@ const addNewItemToCart = (cart: CartItem[], newItem: CartItem): CartItem[] => [
 ];
 
 /**
- * 적용 가능한 최대 할인율 계산
- */
-export const getMaxApplicableDiscount = (
-  item: CartItem,
-  allCartItems: CartItem[]
-): number => {
-  const { discounts } = item.product;
-  const { quantity } = item;
-
-  const baseDiscount = getBaseDiscount(discounts, quantity);
-
-  if (hasBulkPurchase(allCartItems)) {
-    const bulkDiscount = calculateBulkDiscount(baseDiscount);
-    return applyDiscountCap(bulkDiscount);
-  }
-
-  return baseDiscount;
-};
-
-/**
  * 개별 아이템의 할인 적용 후 총액 계산
  */
 export const calculateItemTotal = (
   item: CartItem,
   allCartItems: CartItem[]
 ): number => {
-  const { price } = item.product;
+  const { price, discounts } = item.product;
   const { quantity } = item;
-  const discount = getMaxApplicableDiscount(item, allCartItems);
+
+  const baseDiscount = getBaseDiscount(discounts, quantity);
+
+  const discount = getMaxApplicableDiscount(
+    baseDiscount,
+    hasBulkPurchase(allCartItems)
+  );
 
   return Math.round(price * quantity * (1 - discount));
 };
