@@ -1,9 +1,5 @@
 import { Coupon, Product } from "../../types";
-
-export interface ProductWithUI extends Product {
-  description?: string;
-  isRecommended?: boolean;
-}
+import { ProductWithUI } from "../models/product";
 
 // 초기 상품 목록
 export const initialProducts: ProductWithUI[] = [

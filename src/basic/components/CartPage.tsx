@@ -2,11 +2,7 @@ import { Product, CartItem, Coupon } from "../../types";
 import Cart from "./Cart";
 import { calculateItemTotal } from "../models/cart";
 import { ProductList } from "./ProductList";
-
-export interface ProductWithUI extends Product {
-  description?: string;
-  isRecommended?: boolean;
-}
+import { ProductWithUI } from "../models/product";
 
 interface CartPageProps {
   products: ProductWithUI[];

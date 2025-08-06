@@ -1,14 +1,5 @@
 import React from "react";
-
-interface ProductWithUI {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  description?: string;
-  isRecommended?: boolean;
-  discounts: { quantity: number; rate: number }[];
-}
+import { ProductWithUI } from "../models/product";
 
 interface ProductTableProps {
   products: ProductWithUI[];

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { NotificationType } from "../App";
 import {
   ProductWithUI,
   ProductFormData,
@@ -17,15 +18,12 @@ import { percentToDecimal } from "../utils/formatters";
 export interface Notification {
   id: string;
   message: string;
-  type: "error" | "success" | "warning";
+  type: NotificationType;
 }
 
 export const useProducts = (
   initialProducts: ProductWithUI[],
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void
+  addNotification: (message: string, type?: NotificationType) => void
 ) => {
   const [products, setProducts] = useLocalStorage<ProductWithUI[]>(
     "products",

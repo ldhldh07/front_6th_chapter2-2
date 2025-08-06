@@ -1,25 +1,34 @@
 import { useState, useCallback } from "react";
-import { Coupon, Product } from "../../types";
+import { Coupon } from "../../types";
+import { NotificationType } from "../App";
 import { ProductForm } from "./ProductForm";
 import { ProductTable } from "./ProductTable";
 import { CouponForm } from "./CouponForm";
 import { CouponList } from "./CouponList";
-
-interface ProductWithUI extends Product {
-  description?: string;
-  isRecommended?: boolean;
-}
+import { ProductWithUI, ProductFormData } from "../models/product";
 
 interface AdminPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
   formatPrice: (price: number, productId?: string) => string;
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void;
-  onUpdateProducts: (products: ProductWithUI[]) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
   onUpdateCoupons: (coupons: Coupon[]) => void;
+  productForm: ProductFormData;
+  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
+  editingProduct: string | null;
+  setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>;
+  showProductForm: boolean;
+  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
+  addProduct: (newProduct: Omit<ProductWithUI, "id">) => void;
+  updateProduct: (productId: string, updates: Partial<ProductWithUI>) => void;
+  deleteProduct: (productId: string) => void;
+  handleProductSubmit: (e: React.FormEvent) => void;
+  startEditProduct: (product: ProductWithUI) => void;
+  handleCancelClick: () => void;
+  handleDiscountAdd: () => void;
+  handleDiscountRemove: (index: number) => void;
+  handleDiscountQuantityChange: (index: number, quantity: number) => void;
+  handleDiscountRateChange: (index: number, rate: number) => void;
 }
 
 export const AdminPage = ({
@@ -27,21 +36,25 @@ export const AdminPage = ({
   coupons,
   formatPrice,
   addNotification,
-  onUpdateProducts,
   onUpdateCoupons,
+  productForm,
+  setProductForm,
+  editingProduct,
+  setEditingProduct,
+  showProductForm,
+  setShowProductForm,
+  deleteProduct,
+  handleProductSubmit,
+  startEditProduct,
+  handleCancelClick,
+  handleDiscountAdd,
+  handleDiscountRemove,
+  handleDiscountQuantityChange,
+  handleDiscountRateChange,
 }: AdminPageProps) => {
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
   );
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<string | null>(null);
-  const [productForm, setProductForm] = useState({
-    name: "",
-    price: 0,
-    stock: 0,
-    description: "",
-    discounts: [] as { quantity: number; rate: number }[],
-  });
   const [showCouponForm, setShowCouponForm] = useState(false);
   const [couponForm, setCouponForm] = useState({
     name: "",
@@ -49,40 +62,6 @@ export const AdminPage = ({
     discountType: "amount" as "amount" | "percentage",
     discountValue: 0,
   });
-
-  const addProduct = useCallback(
-    (newProduct: Omit<ProductWithUI, "id">) => {
-      const product: ProductWithUI = {
-        id: `p${Date.now()}`,
-        ...newProduct,
-      };
-      onUpdateProducts([...products, product]);
-      addNotification(`상품 "${product.name}"이(가) 추가되었습니다.`);
-    },
-    [products, onUpdateProducts, addNotification]
-  );
-
-  const updateProduct = useCallback(
-    (productId: string, updates: Partial<ProductWithUI>) => {
-      const updatedProducts = products.map((product) =>
-        product.id === productId ? { ...product, ...updates } : product
-      );
-      onUpdateProducts(updatedProducts);
-      addNotification("상품이 수정되었습니다.");
-    },
-    [products, onUpdateProducts, addNotification]
-  );
-
-  const deleteProduct = useCallback(
-    (productId: string) => {
-      const updatedProducts = products.filter(
-        (product) => product.id !== productId
-      );
-      onUpdateProducts(updatedProducts);
-      addNotification("상품이 삭제되었습니다.");
-    },
-    [products, onUpdateProducts, addNotification]
-  );
 
   const addCoupon = useCallback(
     (newCoupon: Coupon) => {
@@ -107,24 +86,6 @@ export const AdminPage = ({
     [coupons, onUpdateCoupons, addNotification]
   );
 
-  const handleProductSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingProduct === "new") {
-      addProduct(productForm);
-    } else if (editingProduct) {
-      updateProduct(editingProduct, productForm);
-    }
-    setEditingProduct(null);
-    setProductForm({
-      name: "",
-      price: 0,
-      stock: 0,
-      description: "",
-      discounts: [],
-    });
-    setShowProductForm(false);
-  };
-
   const handleCouponSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addCoupon(couponForm);
@@ -135,18 +96,6 @@ export const AdminPage = ({
       discountValue: 0,
     });
     setShowCouponForm(false);
-  };
-
-  const startEditProduct = (product: ProductWithUI) => {
-    setEditingProduct(product.id);
-    setProductForm({
-      name: product.name,
-      price: product.price,
-      stock: product.stock,
-      description: product.description || "",
-      discounts: product.discounts,
-    });
-    setShowProductForm(true);
   };
 
   return (
@@ -189,13 +138,6 @@ export const AdminPage = ({
                 <button
                   onClick={() => {
                     setEditingProduct("new");
-                    setProductForm({
-                      name: "",
-                      price: 0,
-                      stock: 0,
-                      description: "",
-                      discounts: [],
-                    });
                     setShowProductForm(true);
                   }}
                   className="px-4 py-2 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-800"
@@ -220,6 +162,11 @@ export const AdminPage = ({
               setEditingProduct={setEditingProduct}
               setShowProductForm={setShowProductForm}
               addNotification={addNotification}
+              handleCancelClick={handleCancelClick}
+              handleDiscountAdd={handleDiscountAdd}
+              handleDiscountRemove={handleDiscountRemove}
+              handleDiscountQuantityChange={handleDiscountQuantityChange}
+              handleDiscountRateChange={handleDiscountRateChange}
             />
           </section>
         ) : (

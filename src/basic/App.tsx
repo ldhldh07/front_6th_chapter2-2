@@ -2,9 +2,13 @@ import { useState, useCallback, useEffect } from "react";
 import { Coupon } from "../types";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
-import { initialProducts, initialCoupons, ProductWithUI } from "./constants";
+import { initialProducts, initialCoupons } from "./constants";
 import { useCart } from "./hooks/useCart";
-import { Notification } from "./hooks/useProducts.ts";
+import { useProducts, Notification } from "./hooks/useProducts";
+import { formatPrice } from "./models/product";
+import { useLocalStorage } from "./utils/hooks/useLocalStorage";
+
+export type NotificationType = "error" | "success" | "warning";
 
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -26,37 +30,10 @@ const App = () => {
     calculateTotal,
   } = useCart();
 
-  const [products, setProducts] = useState<ProductWithUI[]>(() => {
-    const saved = localStorage.getItem("products");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialProducts;
-      }
-    }
-    return initialProducts;
-  });
-
-  const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    const saved = localStorage.getItem("coupons");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return initialCoupons;
-      }
-    }
-    return initialCoupons;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("products", JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
-    localStorage.setItem("coupons", JSON.stringify(coupons));
-  }, [coupons]);
+  const [coupons, setCoupons] = useLocalStorage<Coupon[]>(
+    "coupons",
+    initialCoupons
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -66,7 +43,7 @@ const App = () => {
   }, [searchTerm]);
 
   const addNotification = useCallback(
-    (message: string, type: "error" | "success" | "warning" = "success") => {
+    (message: string, type: NotificationType = "success") => {
       const id = Date.now().toString();
       setNotifications((prev) => [...prev, { id, message, type }]);
 
@@ -77,22 +54,32 @@ const App = () => {
     []
   );
 
-  const formatPrice = (price: number, productId?: string): string => {
-    if (productId) {
-      const product = products.find((p) => p.id === productId);
-      if (product) {
-        if (product.stock <= 0) {
-          return "SOLD OUT";
-        }
-      }
-    }
+  const {
+    products,
+    productForm,
+    setProductForm,
+    editingProduct,
+    setEditingProduct,
+    showProductForm,
+    setShowProductForm,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    handleProductSubmit,
+    startEditProduct,
+    handleCancelClick,
+    handleDiscountAdd,
+    handleDiscountRemove,
+    handleDiscountQuantityChange,
+    handleDiscountRateChange,
+  } = useProducts(initialProducts, addNotification);
 
-    if (isAdmin) {
-      return `${price.toLocaleString()}원`;
-    }
-
-    return `₩${price.toLocaleString()}`;
-  };
+  const formatPriceWrapper = useCallback(
+    (price: number, productId?: string): string => {
+      return formatPrice(price, productId, products, isAdmin);
+    },
+    [products, isAdmin]
+  );
 
   return (
     <>
@@ -196,17 +183,32 @@ const App = () => {
           <AdminPage
             products={products}
             coupons={coupons}
-            formatPrice={formatPrice}
+            formatPrice={formatPriceWrapper}
             addNotification={addNotification}
-            onUpdateProducts={setProducts}
             onUpdateCoupons={setCoupons}
+            productForm={productForm}
+            setProductForm={setProductForm}
+            editingProduct={editingProduct}
+            setEditingProduct={setEditingProduct}
+            showProductForm={showProductForm}
+            setShowProductForm={setShowProductForm}
+            addProduct={addProduct}
+            updateProduct={updateProduct}
+            deleteProduct={deleteProduct}
+            handleProductSubmit={handleProductSubmit}
+            startEditProduct={startEditProduct}
+            handleCancelClick={handleCancelClick}
+            handleDiscountAdd={handleDiscountAdd}
+            handleDiscountRemove={handleDiscountRemove}
+            handleDiscountQuantityChange={handleDiscountQuantityChange}
+            handleDiscountRateChange={handleDiscountRateChange}
           />
         ) : (
           <CartPage
             products={products}
             coupons={coupons}
             debouncedSearchTerm={debouncedSearchTerm}
-            formatPrice={formatPrice}
+            formatPrice={formatPriceWrapper}
             addNotification={addNotification}
             cart={cart}
             selectedCoupon={selectedCoupon}

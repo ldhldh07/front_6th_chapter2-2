@@ -1,12 +1,6 @@
 import React from "react";
-
-interface ProductFormData {
-  name: string;
-  price: number;
-  stock: number;
-  description: string;
-  discounts: { quantity: number; rate: number }[];
-}
+import { NotificationType } from "../App";
+import { ProductFormData } from "../models/product";
 
 interface ProductFormProps {
   showProductForm: boolean;
@@ -16,10 +10,12 @@ interface ProductFormProps {
   handleProductSubmit: (e: React.FormEvent) => void;
   setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>;
   setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void;
+  addNotification: (message: string, type?: NotificationType) => void;
+  handleCancelClick: () => void;
+  handleDiscountAdd: () => void;
+  handleDiscountRemove: (index: number) => void;
+  handleDiscountQuantityChange: (index: number, quantity: number) => void;
+  handleDiscountRateChange: (index: number, rate: number) => void;
 }
 
 export const ProductForm = ({
@@ -28,55 +24,13 @@ export const ProductForm = ({
   productForm,
   setProductForm,
   handleProductSubmit,
-  setEditingProduct,
-  setShowProductForm,
   addNotification,
+  handleCancelClick,
+  handleDiscountAdd,
+  handleDiscountRemove,
+  handleDiscountQuantityChange,
+  handleDiscountRateChange,
 }: ProductFormProps) => {
-  const handleCancelClick = () => {
-    setEditingProduct(null);
-    setProductForm({
-      name: "",
-      price: 0,
-      stock: 0,
-      description: "",
-      discounts: [],
-    });
-    setShowProductForm(false);
-  };
-
-  const handleDiscountAdd = () => {
-    setProductForm({
-      ...productForm,
-      discounts: [...productForm.discounts, { quantity: 10, rate: 0.1 }],
-    });
-  };
-
-  const handleDiscountRemove = (index: number) => {
-    const newDiscounts = productForm.discounts.filter((_, i) => i !== index);
-    setProductForm({
-      ...productForm,
-      discounts: newDiscounts,
-    });
-  };
-
-  const handleDiscountQuantityChange = (index: number, quantity: number) => {
-    const newDiscounts = [...productForm.discounts];
-    newDiscounts[index].quantity = quantity;
-    setProductForm({
-      ...productForm,
-      discounts: newDiscounts,
-    });
-  };
-
-  const handleDiscountRateChange = (index: number, rate: number) => {
-    const newDiscounts = [...productForm.discounts];
-    newDiscounts[index].rate = rate / 100;
-    setProductForm({
-      ...productForm,
-      discounts: newDiscounts,
-    });
-  };
-
   if (!showProductForm) {
     return null;
   }
