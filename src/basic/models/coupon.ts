@@ -8,19 +8,8 @@ export interface CouponFormData {
 }
 
 // ============================================================================
-// 엔티티를 다루지 않는 함수
+// 내부 순수 함수
 // ============================================================================
-
-/**
- * 쿠폰 할인 금액 계산
- */
-const calculateDiscountAmount = (total: number, coupon: Coupon): number => {
-  if (coupon.discountType === "amount") {
-    return Math.min(total, coupon.discountValue);
-  } else {
-    return total * (coupon.discountValue / 100);
-  }
-};
 
 /**
  * 할인 적용 후 최종 금액 계산
@@ -46,6 +35,69 @@ const generateValidationMessage = (
     ? "percentage 쿠폰은 10,000원 이상 구매 시 사용 가능합니다."
     : "쿠폰을 사용할 수 없습니다.";
 };
+
+/**
+ * 쿠폰 할인 금액 계산
+ */
+const calculateDiscountAmount = (total: number, coupon: Coupon): number => {
+  if (coupon.discountType === "amount") {
+    return Math.min(total, coupon.discountValue);
+  } else {
+    return total * (coupon.discountValue / 100);
+  }
+};
+
+/**
+ * 쿠폰 사용 가능 여부 확인
+ */
+export const isCouponUsageValid = (
+  total: number,
+  discountType: "amount" | "percentage"
+): boolean => {
+  if (discountType === "percentage") {
+    return checkMinimumPurchaseAmount(total);
+  }
+  return true;
+};
+
+/**
+ * 쿠폰 검증 실패 메시지 가져오기
+ */
+export const getCouponValidationMessage = (
+  discountType: "amount" | "percentage"
+): string => generateValidationMessage(discountType);
+
+/**
+ * 쿠폰 적용 가능 여부 검증
+ */
+export const validateCouponApplication = (
+  total: number,
+  coupon: Coupon
+): { valid: boolean; message?: string } => {
+  if (!isCouponUsageValid(total, coupon.discountType)) {
+    return {
+      valid: false,
+      message: getCouponValidationMessage(coupon.discountType),
+    };
+  }
+  return { valid: true };
+};
+
+/**
+ * 쿠폰 할인 적용
+ */
+export const applyCouponDiscount = (total: number, coupon: Coupon): number => {
+  const discountAmount = calculateDiscountAmount(total, coupon);
+  return applyDiscountToTotal(total, discountAmount);
+};
+
+/**
+ * 쿠폰 할인 금액 계산 (적용하지 않고 금액만 계산)
+ */
+export const calculateCouponDiscountAmount = (
+  total: number,
+  coupon: Coupon
+): number => calculateDiscountAmount(total, coupon);
 
 // ============================================================================
 // 엔티티를 다루는 함수
@@ -107,42 +159,6 @@ export const isDuplicateCouponCode = (
 ): boolean => coupons.some((coupon) => coupon.code === code);
 
 /**
- * 쿠폰 사용 가능 여부 확인
- */
-export const isCouponUsageValid = (
-  total: number,
-  discountType: "amount" | "percentage"
-): boolean => {
-  if (discountType === "percentage") {
-    return checkMinimumPurchaseAmount(total);
-  }
-  return true;
-};
-
-/**
- * 쿠폰 검증 실패 메시지 가져오기
- */
-export const getCouponValidationMessage = (
-  discountType: "amount" | "percentage"
-): string => generateValidationMessage(discountType);
-
-/**
- * 쿠폰 적용 가능 여부 검증
- */
-export const validateCouponApplication = (
-  total: number,
-  coupon: Coupon
-): { valid: boolean; message?: string } => {
-  if (!isCouponUsageValid(total, coupon.discountType)) {
-    return {
-      valid: false,
-      message: getCouponValidationMessage(coupon.discountType),
-    };
-  }
-  return { valid: true };
-};
-
-/**
  * 쿠폰 목록에서 특정 쿠폰 제거
  */
 export const removeCouponFromList = (
@@ -165,19 +181,3 @@ export const findCouponByCode = (
   coupons: Coupon[],
   code: string
 ): Coupon | undefined => coupons.find((coupon) => coupon.code === code);
-
-/**
- * 쿠폰 할인 적용
- */
-export const applyCouponDiscount = (total: number, coupon: Coupon): number => {
-  const discountAmount = calculateDiscountAmount(total, coupon);
-  return applyDiscountToTotal(total, discountAmount);
-};
-
-/**
- * 쿠폰 할인 금액 계산 (적용하지 않고 금액만 계산)
- */
-export const calculateCouponDiscountAmount = (
-  total: number,
-  coupon: Coupon
-): number => calculateDiscountAmount(total, coupon);
