@@ -4,12 +4,7 @@ import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
 import { initialProducts, initialCoupons, ProductWithUI } from "./constants";
 import { useCart } from "./hooks/useCart";
-
-interface Notification {
-  id: string;
-  message: string;
-  type: "error" | "success" | "warning";
-}
+import { Notification } from "./hooks/useProducts.ts";
 
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);

@@ -11,3 +11,8 @@ export const formatAdminPrice = (price: number): string => {
 export const formatUserPrice = (price: number): string => {
   return `₩${price.toLocaleString()}`;
 };
+
+/**
+ * 퍼센트를 소수로 변환
+ */
+export const percentToDecimal = (percent: number): number => percent / 100;

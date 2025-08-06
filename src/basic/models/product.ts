@@ -1,18 +1,12 @@
 import { Product } from "../../types";
 import { formatAdminPrice, formatUserPrice } from "../utils/formatters";
 
-interface ProductWithUI extends Product {
+export interface ProductWithUI extends Product {
   description?: string;
   isRecommended?: boolean;
 }
 
-interface Notification {
-  id: string;
-  message: string;
-  type: "error" | "success" | "warning";
-}
-
-interface ProductFormData {
+export interface ProductFormData {
   name: string;
   price: number;
   stock: number;
@@ -23,6 +17,76 @@ interface ProductFormData {
 // ============================================================================
 // 엔티티를 다루지 않는 함수
 // ============================================================================
+
+/**
+ * 기본 할인 정보 생성
+ */
+const createDefaultDiscount = () => ({ quantity: 10, rate: 0.1 });
+
+/**
+ * 할인 목록에 새 할인 추가
+ */
+export const addDiscountToList = (
+  discounts: { quantity: number; rate: number }[]
+) => [...discounts, createDefaultDiscount()];
+
+/**
+ * 할인 목록에서 특정 인덱스 할인 제거
+ */
+export const removeDiscountFromList = (
+  discounts: { quantity: number; rate: number }[],
+  index: number
+) => discounts.filter((_, i) => i !== index);
+
+/**
+ * 할인 목록에서 특정 인덱스의 수량 업데이트
+ */
+export const updateDiscountQuantity = (
+  discounts: { quantity: number; rate: number }[],
+  index: number,
+  quantity: number
+) => {
+  const newDiscounts = [...discounts];
+  newDiscounts[index].quantity = quantity;
+  return newDiscounts;
+};
+
+/**
+ * 할인 목록에서 특정 인덱스의 할인율 업데이트
+ */
+export const updateDiscountRate = (
+  discounts: { quantity: number; rate: number }[],
+  index: number,
+  rate: number
+) => {
+  const newDiscounts = [...discounts];
+  newDiscounts[index].rate = rate;
+  return newDiscounts;
+};
+
+/**
+ * 빈 상품 폼 데이터 생성
+ */
+export const createEmptyProductForm = (): ProductFormData => ({
+  name: "",
+  price: 0,
+  stock: 0,
+  description: "",
+  discounts: [],
+});
+
+/**
+ * 상품 정보로부터 폼 데이터 생성
+ */
+export const createProductFormFromProduct = (
+  product: ProductWithUI
+): ProductFormData => ({
+  name: product.name,
+  price: product.price,
+  stock: product.stock,
+  description: product.description || "",
+  discounts: product.discounts,
+});
 
 /**
  * 상품 ID로 상품 찾기
@@ -63,204 +127,36 @@ export const formatPrice = (
   return formatUserPrice(price);
 };
 
-/**
- * 새 상품 추가
- */
-export const addProduct = (
-  newProduct: Omit<ProductWithUI, "id">,
-  products: ProductWithUI[],
-  onUpdateProducts: (products: ProductWithUI[]) => void,
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void
-) => {
-  const product: ProductWithUI = {
-    id: `p${Date.now()}`,
-    ...newProduct,
-  };
-  onUpdateProducts([...products, product]);
-  addNotification(`상품 "${product.name}"이(가) 추가되었습니다.`);
-};
+// ============================================================================
+// 엔티티를 다루는 함수
+// ============================================================================
 
 /**
- * 상품 수정
+ * 상품 목록에서 특정 상품 업데이트
  */
-export const updateProduct = (
-  productId: string,
-  updates: Partial<ProductWithUI>,
+export const updateProductInList = (
   products: ProductWithUI[],
-  onUpdateProducts: (products: ProductWithUI[]) => void,
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void
-) => {
-  const updatedProducts = products.map((product) =>
+  productId: string,
+  updates: Partial<ProductWithUI>
+): ProductWithUI[] =>
+  products.map((product) =>
     product.id === productId ? { ...product, ...updates } : product
   );
-  onUpdateProducts(updatedProducts);
-  addNotification("상품이 수정되었습니다.");
-};
 
 /**
- * 상품 삭제
+ * 상품 목록에서 특정 상품 제거
  */
-export const deleteProduct = (
-  productId: string,
+export const removeProductFromList = (
   products: ProductWithUI[],
-  onUpdateProducts: (products: ProductWithUI[]) => void,
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void
-) => {
-  const updatedProducts = products.filter(
-    (product) => product.id !== productId
-  );
-  onUpdateProducts(updatedProducts);
-  addNotification("상품이 삭제되었습니다.");
-};
+  productId: string
+): ProductWithUI[] => products.filter((product) => product.id !== productId);
 
-/**
- * 상품 폼 제출 처리
- */
-export const handleProductSubmit = (
-  e: React.FormEvent,
-  editingProduct: string | null,
-  productForm: ProductFormData,
-  products: ProductWithUI[],
-  onUpdateProducts: (products: ProductWithUI[]) => void,
-  addNotification: (
-    message: string,
-    type?: "error" | "success" | "warning"
-  ) => void,
-  setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>,
-  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  e.preventDefault();
-  if (editingProduct === "new") {
-    addProduct(productForm, products, onUpdateProducts, addNotification);
-  } else if (editingProduct) {
-    updateProduct(
-      editingProduct,
-      productForm,
-      products,
-      onUpdateProducts,
-      addNotification
-    );
-  }
-  setEditingProduct(null);
-  setProductForm({
-    name: "",
-    price: 0,
-    stock: 0,
-    description: "",
-    discounts: [],
-  });
-  setShowProductForm(false);
-};
+export const generateProductId = (date: number): string => `p${date}`;
 
-/**
- * 상품 편집 시작
- */
-export const startEditProduct = (
-  product: ProductWithUI,
-  setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>,
-  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  setEditingProduct(product.id);
-  setProductForm({
-    name: product.name,
-    price: product.price,
-    stock: product.stock,
-    description: product.description || "",
-    discounts: product.discounts,
-  });
-  setShowProductForm(true);
-};
-
-/**
- * 폼 취소 처리
- */
-export const handleCancelClick = (
-  setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>,
-  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  setEditingProduct(null);
-  setProductForm({
-    name: "",
-    price: 0,
-    stock: 0,
-    description: "",
-    discounts: [],
-  });
-  setShowProductForm(false);
-};
-
-/**
- * 할인 추가
- */
-export const handleDiscountAdd = (
-  productForm: ProductFormData,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>
-) => {
-  setProductForm({
-    ...productForm,
-    discounts: [...productForm.discounts, { quantity: 10, rate: 0.1 }],
-  });
-};
-
-/**
- * 할인 제거
- */
-export const handleDiscountRemove = (
-  index: number,
-  productForm: ProductFormData,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>
-) => {
-  const newDiscounts = productForm.discounts.filter((_, i) => i !== index);
-  setProductForm({
-    ...productForm,
-    discounts: newDiscounts,
-  });
-};
-
-/**
- * 할인 수량 변경
- */
-export const handleDiscountQuantityChange = (
-  index: number,
-  quantity: number,
-  productForm: ProductFormData,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>
-) => {
-  const newDiscounts = [...productForm.discounts];
-  newDiscounts[index].quantity = quantity;
-  setProductForm({
-    ...productForm,
-    discounts: newDiscounts,
-  });
-};
-
-/**
- * 할인율 변경
- */
-export const handleDiscountRateChange = (
-  index: number,
-  rate: number,
-  productForm: ProductFormData,
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>
-) => {
-  const newDiscounts = [...productForm.discounts];
-  newDiscounts[index].rate = rate / 100;
-  setProductForm({
-    ...productForm,
-    discounts: newDiscounts,
-  });
-};
-
-export type { ProductWithUI, ProductFormData };
+export const createProduct = (
+  newProduct: Omit<ProductWithUI, "id">,
+  id: string
+): ProductWithUI => ({
+  id,
+  ...newProduct,
+});
