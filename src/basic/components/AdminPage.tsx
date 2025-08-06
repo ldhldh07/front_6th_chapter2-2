@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Coupon } from "../../types";
 import { NotificationType } from "../App";
 import { ProductForm } from "./ProductForm";
@@ -6,13 +6,20 @@ import { ProductTable } from "./ProductTable";
 import { CouponForm } from "./CouponForm";
 import { CouponList } from "./CouponList";
 import { ProductWithUI, ProductFormData } from "../models/product";
+import { CouponFormData } from "../models/coupon";
 
 interface AdminPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
   formatPrice: (price: number, productId?: string) => string;
   addNotification: (message: string, type?: NotificationType) => void;
-  onUpdateCoupons: (coupons: Coupon[]) => void;
+  couponForm: CouponFormData;
+  setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
+  showCouponForm: boolean;
+  setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
+  addCoupon: (newCoupon: Coupon) => void;
+  deleteCoupon: (couponCode: string) => void;
+  emptyCouponForm: CouponFormData;
   productForm: ProductFormData;
   setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
   editingProduct: string | null;
@@ -36,7 +43,13 @@ export const AdminPage = ({
   coupons,
   formatPrice,
   addNotification,
-  onUpdateCoupons,
+  couponForm,
+  setCouponForm,
+  showCouponForm,
+  setShowCouponForm,
+  addCoupon,
+  deleteCoupon,
+  emptyCouponForm,
   productForm,
   setProductForm,
   editingProduct,
@@ -55,46 +68,11 @@ export const AdminPage = ({
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
   );
-  const [showCouponForm, setShowCouponForm] = useState(false);
-  const [couponForm, setCouponForm] = useState({
-    name: "",
-    code: "",
-    discountType: "amount" as "amount" | "percentage",
-    discountValue: 0,
-  });
 
-  const addCoupon = useCallback(
-    (newCoupon: Coupon) => {
-      if (coupons.find((coupon) => coupon.code === newCoupon.code)) {
-        addNotification("이미 존재하는 쿠폰 코드입니다.", "error");
-        return;
-      }
-      onUpdateCoupons([...coupons, newCoupon]);
-      addNotification(`쿠폰 "${newCoupon.name}"이(가) 생성되었습니다.`);
-    },
-    [coupons, onUpdateCoupons, addNotification]
-  );
-
-  const deleteCoupon = useCallback(
-    (couponCode: string) => {
-      const updatedCoupons = coupons.filter(
-        (coupon) => coupon.code !== couponCode
-      );
-      onUpdateCoupons(updatedCoupons);
-      addNotification("쿠폰이 삭제되었습니다.");
-    },
-    [coupons, onUpdateCoupons, addNotification]
-  );
-
-  const handleCouponSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCouponSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     addCoupon(couponForm);
-    setCouponForm({
-      name: "",
-      code: "",
-      discountType: "amount",
-      discountValue: 0,
-    });
+    setCouponForm(emptyCouponForm);
     setShowCouponForm(false);
   };
 

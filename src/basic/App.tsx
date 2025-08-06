@@ -4,8 +4,10 @@ import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
 import { initialProducts, initialCoupons } from "./constants";
 import { useCart } from "./hooks/useCart";
+import { useCoupons } from "./hooks/useCoupons";
 import { useProducts, Notification } from "./hooks/useProducts";
 import { formatPrice } from "./models/product";
+import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
 
 export type NotificationType = "error" | "success" | "warning";
@@ -19,12 +21,9 @@ const App = () => {
   const {
     cart,
     cartItemCount,
-    selectedCoupon,
-    setSelectedCoupon,
     addToCart,
     removeFromCart,
     updateQuantity,
-    applyCoupon,
     completeOrder,
     getStockForProduct,
     calculateTotal,
@@ -53,6 +52,23 @@ const App = () => {
     },
     []
   );
+
+  const {
+    couponForm,
+    setCouponForm,
+    showCouponForm,
+    setShowCouponForm,
+    addCoupon,
+    deleteCoupon,
+    selectedCoupon,
+    setSelectedCoupon,
+    applyCoupon,
+  } = useCoupons({
+    coupons,
+    onUpdateCoupons: setCoupons,
+    addNotification,
+    cart,
+  });
 
   const {
     products,
@@ -185,7 +201,13 @@ const App = () => {
             coupons={coupons}
             formatPrice={formatPriceWrapper}
             addNotification={addNotification}
-            onUpdateCoupons={setCoupons}
+            couponForm={couponForm}
+            setCouponForm={setCouponForm}
+            showCouponForm={showCouponForm}
+            setShowCouponForm={setShowCouponForm}
+            addCoupon={addCoupon}
+            deleteCoupon={deleteCoupon}
+            emptyCouponForm={createEmptyCouponForm()}
             productForm={productForm}
             setProductForm={setProductForm}
             editingProduct={editingProduct}

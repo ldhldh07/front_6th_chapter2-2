@@ -1,4 +1,5 @@
 import { CartItem, Coupon, Product } from "../../types";
+import { applyCouponDiscount } from "./coupon";
 
 // ============================================================================
 // 엔티티를 다루지 않는 함수
@@ -34,22 +35,6 @@ const applyDiscountCap = (
   discountRate: number,
   maxDiscount: number = 0.5
 ): number => Math.min(discountRate, maxDiscount);
-
-/**
- * 금액 할인 적용 (고정 금액)
- */
-const applyAmountDiscount = (
-  totalPrice: number,
-  discountAmount: number
-): number => Math.max(0, totalPrice - discountAmount);
-
-/**
- * 퍼센트 할인 적용 (비율)
- */
-const applyPercentageDiscount = (
-  totalPrice: number,
-  discountPercentage: number
-): number => Math.round(totalPrice * (1 - discountPercentage / 100));
 
 /**
  * 남은 재고 계산
@@ -165,20 +150,6 @@ export const calculateDiscountedTotal = (cart: CartItem[]): number =>
   cart.reduce((total, item) => total + calculateItemTotal(item, cart), 0);
 
 /**
- * 쿠폰 할인 적용
- */
-export const applyCouponDiscount = (
-  totalPrice: number,
-  coupon: Coupon
-): number => {
-  if (coupon.discountType === "amount") {
-    return applyAmountDiscount(totalPrice, coupon.discountValue);
-  } else {
-    return applyPercentageDiscount(totalPrice, coupon.discountValue);
-  }
-};
-
-/**
  * 장바구니 총액 계산 (할인 전/후)
  */
 export const calculateCartTotal = (
@@ -262,14 +233,6 @@ export const findCartItemByProductId = (
   cart: CartItem[],
   productId: string
 ): CartItem | undefined => cart.find((item) => item.product.id === productId);
-
-/**
- * 쿠폰 사용 조건 검증
- */
-export const isCouponUsageValid = (
-  total: number,
-  couponType: string
-): boolean => !(total < 10000 && couponType === "percentage");
 
 /**
  * 장바구니 총 아이템 개수 계산

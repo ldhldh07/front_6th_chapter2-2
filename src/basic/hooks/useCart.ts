@@ -4,12 +4,11 @@ import {
   addItemToCart,
   removeItemFromCart,
   updateCartItemQuantity,
-  calculateCartTotal,
   getRemainingStock,
   calculateTotalItemCount,
+  calculateCartTotal,
   generateOrderNumber,
   isStockExceeded,
-  isCouponUsageValid,
   findCartItemByProductId,
 } from "../models/cart";
 import { findProductById } from "../models/product";
@@ -18,7 +17,6 @@ import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 export const useCart = () => {
   const [cart, setCart] = useLocalStorage<CartItem[]>("cart", []);
   const [cartItemCount, setCartItemCount] = useState(0);
-  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
 
   useEffect(() => {
     const count = calculateTotalItemCount(cart);
@@ -88,33 +86,6 @@ export const useCart = () => {
     [cart]
   );
 
-  const applyCoupon = useCallback(
-    (
-      coupon: Coupon,
-      addNotification: (
-        message: string,
-        type?: "error" | "success" | "warning"
-      ) => void
-    ) => {
-      const currentTotal = calculateCartTotal(
-        cart,
-        selectedCoupon
-      ).totalAfterDiscount;
-
-      if (!isCouponUsageValid(currentTotal, coupon.discountType)) {
-        addNotification(
-          "percentage 쿠폰은 10,000원 이상 구매 시 사용 가능합니다.",
-          "error"
-        );
-        return;
-      }
-
-      setSelectedCoupon(coupon);
-      addNotification("쿠폰이 적용되었습니다.", "success");
-    },
-    [cart, selectedCoupon]
-  );
-
   const completeOrder = useCallback(
     (
       addNotification: (
@@ -128,7 +99,6 @@ export const useCart = () => {
         "success"
       );
       setCart([]);
-      setSelectedCoupon(null);
     },
     []
   );
@@ -140,26 +110,21 @@ export const useCart = () => {
     [cart]
   );
 
+  // 장바구니 총액 계산
   const calculateTotal = useCallback(
     (cartItems?: CartItem[], coupon?: Coupon | null) => {
-      return calculateCartTotal(
-        cartItems || cart,
-        coupon !== undefined ? coupon : selectedCoupon
-      );
+      return calculateCartTotal(cartItems || cart, coupon || null);
     },
-    [cart, selectedCoupon]
+    [cart]
   );
 
   return {
     cart,
     setCart,
     cartItemCount,
-    selectedCoupon,
-    setSelectedCoupon,
     addToCart,
     removeFromCart,
     updateQuantity,
-    applyCoupon,
     completeOrder,
     getStockForProduct,
     calculateTotal,
