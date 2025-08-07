@@ -1,4 +1,4 @@
-import { Coupon, Product } from "../../types";
+import { Coupon } from "../../types";
 import { ProductWithUI } from "../models/product";
 
 // 초기 상품 목록

@@ -1,4 +1,3 @@
-import React from "react";
 import { UIToast } from "./UIToast";
 import { Notification } from "../../hooks/useNotifications";
 

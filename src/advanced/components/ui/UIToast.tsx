@@ -1,5 +1,5 @@
 import { CloseIcon } from "../icons";
-import { Notification } from "../../hooks/useNotifications";
+import { Notification } from "../../atoms/appAtoms";
 
 interface UIToastProps {
   notification: Notification;

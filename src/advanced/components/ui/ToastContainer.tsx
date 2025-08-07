@@ -1,6 +1,5 @@
-import React from "react";
 import { UIToast } from "./UIToast";
-import { Notification } from "../../hooks/useNotifications";
+import { Notification } from "../../atoms/appAtoms";
 
 interface ToastContainerProps {
   notifications: Notification[];

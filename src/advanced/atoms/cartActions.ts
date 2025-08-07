@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { CartItem, Product, Coupon } from "../../types";
+import { Product, Coupon } from "../../types";
 import {
   addItemToCart,
   removeItemFromCart,
