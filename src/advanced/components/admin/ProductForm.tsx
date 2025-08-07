@@ -1,19 +1,14 @@
 import React from "react";
-import { useAtom } from "jotai";
 import { CloseIcon } from ".././icons";
 import { useValidate } from "../../utils/hooks/useValidate";
 import { safeParseInt } from "../../utils/validators";
-import { productFormAtom, editingProductAtom } from "../../atoms/appAtoms";
+import { useProducts } from "../../hooks/useProducts";
 
 interface ProductFormProps {
   showProductForm: boolean;
   handleProductSubmit: (e: React.FormEvent) => void;
   onError: (message: string) => void;
   handleCancelClick: () => void;
-  handleDiscountAdd: () => void;
-  handleDiscountRemove: (index: number) => void;
-  handleDiscountQuantityChange: (index: number, quantity: number) => void;
-  handleDiscountRateChange: (index: number, rate: number) => void;
 }
 
 export const ProductForm = ({
@@ -21,13 +16,16 @@ export const ProductForm = ({
   handleProductSubmit,
   onError,
   handleCancelClick,
-  handleDiscountAdd,
-  handleDiscountRemove,
-  handleDiscountQuantityChange,
-  handleDiscountRateChange,
 }: ProductFormProps) => {
-  const [productForm, setProductForm] = useAtom(productFormAtom);
-  const [editingProduct] = useAtom(editingProductAtom);
+  const {
+    productForm,
+    setProductForm,
+    editingProduct,
+    addDiscountAction,
+    removeDiscountAction,
+    updateDiscountQuantityAction,
+    updateDiscountRateAction,
+  } = useProducts();
   const { validatePrice, validateStock, filterNumericInput } = useValidate();
 
   if (!showProductForm) {
@@ -169,10 +167,10 @@ export const ProductForm = ({
                   type="number"
                   value={discount.quantity}
                   onChange={(e) =>
-                    handleDiscountQuantityChange(
+                    updateDiscountQuantityAction({
                       index,
-                      safeParseInt(e.target.value)
-                    )
+                      quantity: safeParseInt(e.target.value),
+                    })
                   }
                   className="w-20 px-2 py-1 border rounded"
                   min="1"
@@ -183,10 +181,10 @@ export const ProductForm = ({
                   type="number"
                   value={discount.rate * 100}
                   onChange={(e) =>
-                    handleDiscountRateChange(
+                    updateDiscountRateAction({
                       index,
-                      safeParseInt(e.target.value)
-                    )
+                      rate: safeParseInt(e.target.value) / 100,
+                    })
                   }
                   className="w-16 px-2 py-1 border rounded"
                   min="0"
@@ -196,7 +194,7 @@ export const ProductForm = ({
                 <span className="text-sm">% 할인</span>
                 <button
                   type="button"
-                  onClick={() => handleDiscountRemove(index)}
+                  onClick={() => removeDiscountAction(index)}
                   className="text-red-600 hover:text-red-800"
                 >
                   <CloseIcon className="w-4 h-4" />
@@ -205,7 +203,7 @@ export const ProductForm = ({
             ))}
             <button
               type="button"
-              onClick={handleDiscountAdd}
+              onClick={() => addDiscountAction()}
               className="text-sm text-indigo-600 hover:text-indigo-800"
             >
               + 할인 추가

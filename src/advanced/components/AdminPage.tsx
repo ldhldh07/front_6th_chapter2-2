@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useAtom } from "jotai";
 import { Coupon } from "../../types";
 import { CouponForm } from "./admin/CouponForm";
 import { ProductWithUI, createEmptyProductForm } from "../models/product";
@@ -7,7 +6,7 @@ import { CouponFormData } from "../models/coupon";
 import { ProductForm } from "./admin/ProductForm";
 import { ProductTable } from "./admin/ProductTable";
 import { CouponList } from "./admin/CouponList";
-import { productFormAtom, editingProductAtom } from "../atoms/appAtoms";
+import { useProducts } from "../hooks/useProducts";
 
 interface AdminPageProps {
   coupons: Coupon[];
@@ -18,15 +17,8 @@ interface AdminPageProps {
   addCoupon: (newCoupon: Coupon) => void;
   deleteCoupon: (couponCode: string) => void;
   onError: (message: string) => void;
+  onSuccess: (message: string) => void;
   emptyCouponForm: CouponFormData;
-  addProduct: (newProduct: Omit<ProductWithUI, "id">) => void;
-  updateProduct: (productId: string, updates: Partial<ProductWithUI>) => void;
-  deleteProduct: (productId: string) => void;
-  startEditProduct: (product: ProductWithUI) => void;
-  handleDiscountAdd: () => void;
-  handleDiscountRemove: (index: number) => void;
-  handleDiscountQuantityChange: (index: number, quantity: number) => void;
-  handleDiscountRateChange: (index: number, rate: number) => void;
 }
 
 export const AdminPage = ({
@@ -38,18 +30,18 @@ export const AdminPage = ({
   addCoupon,
   deleteCoupon,
   onError,
+  onSuccess,
   emptyCouponForm,
-  addProduct,
-  updateProduct,
-  deleteProduct,
-  startEditProduct,
-  handleDiscountAdd,
-  handleDiscountRemove,
-  handleDiscountQuantityChange,
-  handleDiscountRateChange,
 }: AdminPageProps) => {
-  const [productForm, setProductForm] = useAtom(productFormAtom);
-  const [editingProduct, setEditingProduct] = useAtom(editingProductAtom);
+  const {
+    productForm,
+    setProductForm,
+    editingProduct,
+    setEditingProduct,
+    addProduct,
+    updateProduct,
+    startEditProductAction,
+  } = useProducts(onSuccess);
 
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
@@ -62,7 +54,7 @@ export const AdminPage = ({
   };
 
   const handleStartEditProduct = (product: ProductWithUI) => {
-    startEditProduct(product);
+    startEditProductAction(product);
     setShowProductForm(true);
   };
 
@@ -83,8 +75,6 @@ export const AdminPage = ({
       updateProduct(editingProduct, productForm);
     }
 
-    setEditingProduct(null);
-    setProductForm(createEmptyProductForm());
     setShowProductForm(false);
   };
 
@@ -136,17 +126,13 @@ export const AdminPage = ({
 
             <ProductTable
               startEditProduct={handleStartEditProduct}
-              deleteProduct={deleteProduct}
+              onSuccess={onSuccess}
             />
             <ProductForm
               showProductForm={showProductForm}
               handleProductSubmit={handleSubmitForm}
               onError={onError}
               handleCancelClick={handleCancelForm}
-              handleDiscountAdd={handleDiscountAdd}
-              handleDiscountRemove={handleDiscountRemove}
-              handleDiscountQuantityChange={handleDiscountQuantityChange}
-              handleDiscountRateChange={handleDiscountRateChange}
             />
           </section>
         ) : (

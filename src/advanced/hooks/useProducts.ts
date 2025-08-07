@@ -1,155 +1,88 @@
-import { useCallback } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
+import { ProductWithUI } from "../models/product";
 import {
-  ProductWithUI,
-  createProduct,
-  generateProductId,
-  createProductFormFromProduct,
-} from "../models/product";
-import {
-  Discount,
-  addDiscountToList,
-  removeDiscountFromList,
-} from "../models/discount";
-import { percentToDecimal } from "../utils/formatters";
+  addProductActionAtom,
+  updateProductActionAtom,
+  deleteProductActionAtom,
+  startEditProductActionAtom,
+  addDiscountActionAtom,
+  removeDiscountActionAtom,
+  updateDiscountQuantityActionAtom,
+  updateDiscountRateActionAtom,
+} from "../atoms/productActions";
 import {
   productsAtom,
   productFormAtom,
   editingProductAtom,
 } from "../atoms/appAtoms";
+import { percentToDecimal } from "../utils/formatters";
 
-export const useProducts = (onSuccess: (message: string) => void) => {
-  const [_products, setProducts] = useAtom(productsAtom);
-  const [_productForm, setProductForm] = useAtom(productFormAtom);
-  const [_editingProduct, setEditingProduct] = useAtom(editingProductAtom);
+export const useProducts = (onSuccess?: (message: string) => void) => {
+  // Atom states
+  const [products, setProducts] = useAtom(productsAtom);
+  const [productForm, setProductForm] = useAtom(productFormAtom);
+  const [editingProduct, setEditingProduct] = useAtom(editingProductAtom);
 
-  /**
-   * 새 상품 추가
-   */
-  const addProduct = useCallback(
-    (newProduct: Omit<ProductWithUI, "id">) => {
-      const product: ProductWithUI = createProduct(
-        newProduct,
-        generateProductId(Date.now())
-      );
-      setProducts((prev) => [...prev, product]);
-      onSuccess(`상품 "${product.name}"이(가) 추가되었습니다.`);
-    },
-    [setProducts, onSuccess]
+  // Atom actions
+  const addProductAction = useSetAtom(addProductActionAtom);
+  const updateProductAction = useSetAtom(updateProductActionAtom);
+  const deleteProductAction = useSetAtom(deleteProductActionAtom);
+  const startEditProductAction = useSetAtom(startEditProductActionAtom);
+  const addDiscountAction = useSetAtom(addDiscountActionAtom);
+  const removeDiscountAction = useSetAtom(removeDiscountActionAtom);
+  const updateDiscountQuantityAction = useSetAtom(
+    updateDiscountQuantityActionAtom
   );
+  const updateDiscountRateAction = useSetAtom(updateDiscountRateActionAtom);
 
-  /**
-   * 상품 수정
-   */
-  const updateProduct = useCallback(
-    (productId: string, updates: Partial<ProductWithUI>) => {
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.id === productId ? { ...product, ...updates } : product
-        )
-      );
-      onSuccess("상품이 수정되었습니다.");
-    },
-    [setProducts, onSuccess]
-  );
+  const addProduct = (newProduct: Omit<ProductWithUI, "id">) => {
+    if (onSuccess) {
+      addProductAction({ newProduct, onSuccess });
+    } else {
+      addProductAction({ newProduct, onSuccess: () => {} });
+    }
+  };
 
-  /**
-   * 상품 삭제
-   */
-  const deleteProduct = useCallback(
-    (productId: string) => {
-      setProducts((prev) => prev.filter((product) => product.id !== productId));
+  const updateProduct = (
+    productId: string,
+    updates: Partial<ProductWithUI>
+  ) => {
+    if (onSuccess) {
+      updateProductAction({ productId, updates, onSuccess });
+    } else {
+      updateProductAction({ productId, updates, onSuccess: () => {} });
+    }
+  };
+
+  const deleteProduct = (productId: string) => {
+    deleteProductAction(productId);
+    if (onSuccess) {
       onSuccess("상품이 삭제되었습니다.");
-    },
-    [setProducts, onSuccess]
-  );
-
-  /**
-   * 상품 편집 시작
-   */
-  const startEditProduct = useCallback((product: ProductWithUI) => {
-    setEditingProduct(product.id);
-    setProductForm(createProductFormFromProduct(product));
-  }, []);
-
-  /**
-   * 할인 정보 업데이트 헬퍼 함수
-   */
-  const updateDiscounts = useCallback(
-    (updater: (discounts: Discount[]) => Discount[]) => {
-      setProductForm((prev) => ({
-        ...prev,
-        discounts: updater(prev.discounts),
-      }));
-    },
-    []
-  );
-
-  /**
-   * 할인 정보 직접 설정
-   */
-  const setProductFormDiscounts = useCallback(
-    (newDiscounts: Discount[]) => {
-      updateDiscounts(() => newDiscounts);
-    },
-    [updateDiscounts]
-  );
-
-  /**
-   * 할인 추가
-   */
-  const handleDiscountAdd = useCallback(() => {
-    updateDiscounts(addDiscountToList);
-  }, [updateDiscounts]);
-
-  /**
-   * 할인 제거
-   */
-  const handleDiscountRemove = useCallback(
-    (index: number) => {
-      updateDiscounts((discounts) => removeDiscountFromList(discounts, index));
-    },
-    [updateDiscounts]
-  );
-
-  /**
-   * 할인 수량 변경
-   */
-  const handleDiscountQuantityChange = useCallback(
-    (index: number, quantity: number) => {
-      updateDiscounts((discounts) =>
-        discounts.map((discount, i) =>
-          i === index ? { ...discount, quantity } : discount
-        )
-      );
-    },
-    [updateDiscounts]
-  );
-
-  /**
-   * 할인율 변경
-   */
-  const handleDiscountRateChange = useCallback(
-    (index: number, rate: number) => {
-      updateDiscounts((discounts) =>
-        discounts.map((discount, i) =>
-          i === index ? { ...discount, rate: percentToDecimal(rate) } : discount
-        )
-      );
-    },
-    [updateDiscounts]
-  );
+    }
+  };
 
   return {
+    products,
+    setProducts,
+    productForm,
+    setProductForm,
+    editingProduct,
+    setEditingProduct,
+
+    addProductAction,
+    updateProductAction,
+    deleteProductAction,
+    startEditProductAction,
+
     addProduct,
     updateProduct,
     deleteProduct,
-    startEditProduct,
-    handleDiscountAdd,
-    handleDiscountRemove,
-    handleDiscountQuantityChange,
-    handleDiscountRateChange,
-    updateDiscounts,
-    setProductFormDiscounts,
+
+    addDiscountAction,
+    removeDiscountAction,
+    updateDiscountQuantityAction,
+    updateDiscountRateAction,
+
+    percentToDecimal,
   };
 };

@@ -1,18 +1,18 @@
-import { useAtom } from "jotai";
 import { ProductWithUI, formatPriceForAdmin } from "../../models/product";
 import { getStockStatus } from "../../utils/validators";
-import { productsAtom } from "../../atoms/appAtoms";
+import { useProducts } from "../../hooks/useProducts";
 
 interface ProductTableProps {
   startEditProduct: (product: ProductWithUI) => void;
-  deleteProduct: (productId: string) => void;
+  onSuccess: (message: string) => void;
 }
 
 export const ProductTable = ({
   startEditProduct,
-  deleteProduct,
+  onSuccess,
 }: ProductTableProps) => {
-  const [products] = useAtom(productsAtom);
+  const { products, deleteProduct } = useProducts(onSuccess);
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">

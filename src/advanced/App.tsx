@@ -3,10 +3,9 @@ import { Coupon } from "../types";
 import { isAdminAtom, searchTermAtom } from "./atoms/appAtoms";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
-import { initialProducts, initialCoupons } from "./constants";
+import { initialCoupons } from "./constants";
 import { useCart } from "./hooks/useCart";
 import { useCoupons } from "./hooks/useCoupons";
-import { useProducts } from "./hooks/useProducts";
 import { useNotifications } from "./hooks/useNotifications";
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
@@ -56,17 +55,6 @@ const App = () => {
     onError,
     cart,
   });
-
-  const {
-    addProduct,
-    updateProduct,
-    deleteProduct,
-    startEditProduct,
-    handleDiscountAdd,
-    handleDiscountRemove,
-    handleDiscountQuantityChange,
-    handleDiscountRateChange,
-  } = useProducts(onSuccess);
 
   return (
     <>
@@ -128,15 +116,8 @@ const App = () => {
             addCoupon={addCoupon}
             deleteCoupon={deleteCoupon}
             onError={onError}
+            onSuccess={onSuccess}
             emptyCouponForm={createEmptyCouponForm()}
-            addProduct={addProduct}
-            updateProduct={updateProduct}
-            deleteProduct={deleteProduct}
-            startEditProduct={startEditProduct}
-            handleDiscountAdd={handleDiscountAdd}
-            handleDiscountRemove={handleDiscountRemove}
-            handleDiscountQuantityChange={handleDiscountQuantityChange}
-            handleDiscountRateChange={handleDiscountRateChange}
           />
         ) : (
           <CartPage
