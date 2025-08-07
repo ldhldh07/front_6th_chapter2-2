@@ -3,7 +3,7 @@ import Cart from "./cart/Cart";
 import { calculateItemTotal } from "../models/cart";
 import { ProductList } from "./cart/ProductList";
 import { ProductWithUI } from "../models/product";
-import { NotificationType } from "../App";
+import { filterProductsBySearchTerm } from "../models/search";
 
 interface CartPageProps {
   products: ProductWithUI[];
@@ -57,18 +57,10 @@ export const CartPage = ({
 }: CartPageProps) => {
   const totals = calculateTotal(cart, selectedCoupon);
 
-  const filteredProducts = debouncedSearchTerm
-    ? products.filter(
-        (product) =>
-          product.name
-            .toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase()) ||
-          (product.description &&
-            product.description
-              .toLowerCase()
-              .includes(debouncedSearchTerm.toLowerCase()))
-      )
-    : products;
+  const filteredProducts = filterProductsBySearchTerm(
+    products,
+    debouncedSearchTerm
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

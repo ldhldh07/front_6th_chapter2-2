@@ -1,4 +1,5 @@
 import { formatPriceForUser } from "../../models/product";
+import { filterProductsBySearchTerm } from "../../models/search";
 import { ImageIcon } from "../icons";
 import { getStockStatus } from "../../utils/validators";
 import { useCart } from "../../hooks/useCart";
@@ -14,18 +15,10 @@ export const ProductList = () => {
   const { products } = useProducts();
   const { addToCart, getStockForProduct } = useCart();
 
-  const filteredProducts = debouncedSearchTerm
-    ? products.filter(
-        (product) =>
-          product.name
-            .toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase()) ||
-          (product.description &&
-            product.description
-              .toLowerCase()
-              .includes(debouncedSearchTerm.toLowerCase()))
-      )
-    : products;
+  const filteredProducts = filterProductsBySearchTerm(
+    products,
+    debouncedSearchTerm
+  );
   return (
     <section>
       <div className="mb-6 flex justify-between items-center">

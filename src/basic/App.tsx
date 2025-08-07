@@ -10,6 +10,7 @@ import { useNotifications } from "./hooks/useNotifications";
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
 import { useDebounce } from "./utils/hooks/useDebounce";
+
 import { CartIcon } from "./components/icons";
 import { ToastContainer } from "./components/ui";
 
@@ -73,6 +74,10 @@ const App = () => {
     handleDiscountRateChange,
   } = useProducts(initialProducts, onSuccess);
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
   return (
     <>
       <ToastContainer
@@ -90,7 +95,7 @@ const App = () => {
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleSearchChange}
                     placeholder="상품 검색..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                   />
