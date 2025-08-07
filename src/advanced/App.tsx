@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { useAtom } from "jotai";
 import { Coupon } from "../types";
-import { isAdminAtom } from "./atoms/appAtoms";
+import { isAdminAtom, searchTermAtom } from "./atoms/appAtoms";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
 import { initialProducts, initialCoupons } from "./constants";
@@ -11,7 +10,7 @@ import { useProducts } from "./hooks/useProducts";
 import { useNotifications } from "./hooks/useNotifications";
 import { createEmptyCouponForm } from "./models/coupon";
 import { useLocalStorage } from "./utils/hooks/useLocalStorage";
-import { useDebounce } from "./utils/hooks/useDebounce";
+
 import { CartIcon } from "./components/icons";
 import { ToastContainer } from "./components/ui";
 
@@ -19,8 +18,7 @@ export type NotificationType = "error" | "success" | "warning";
 
 const App = () => {
   const [isAdmin, setIsAdmin] = useAtom(isAdminAtom);
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchTerm, setSearchTerm] = useAtom(searchTermAtom);
 
   const { notifications, onSuccess, onError, removeNotification } =
     useNotifications();
@@ -92,7 +90,7 @@ const App = () => {
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(event) => setSearchTerm(event.target.value)}
                     placeholder="상품 검색..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                   />
@@ -154,7 +152,6 @@ const App = () => {
           <CartPage
             products={products}
             coupons={coupons}
-            debouncedSearchTerm={debouncedSearchTerm}
             onSuccess={onSuccess}
             onError={onError}
             cart={cart}

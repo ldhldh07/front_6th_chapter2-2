@@ -1,14 +1,15 @@
+import { useAtom } from "jotai";
 import { Product, CartItem, Coupon } from "../../types";
 import Cart from "./cart/Cart";
 import { calculateItemTotal } from "../models/cart";
 import { ProductList } from "./cart/ProductList";
 import { ProductWithUI } from "../models/product";
-import { NotificationType } from "../App";
+import { useDebounce } from "../utils/hooks/useDebounce";
+import { searchTermAtom } from "../atoms/appAtoms";
 
 interface CartPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
-  debouncedSearchTerm: string;
   cart: CartItem[];
   selectedCoupon: Coupon | null;
   setSelectedCoupon: (coupon: Coupon | null) => void;
@@ -41,7 +42,6 @@ interface CartPageProps {
 export const CartPage = ({
   products,
   coupons,
-  debouncedSearchTerm,
   cart,
   selectedCoupon,
   setSelectedCoupon,
@@ -55,6 +55,8 @@ export const CartPage = ({
   getStockForProduct,
   calculateTotal,
 }: CartPageProps) => {
+  const [searchTerm] = useAtom(searchTermAtom);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const totals = calculateTotal(cart, selectedCoupon);
 
   const filteredProducts = debouncedSearchTerm

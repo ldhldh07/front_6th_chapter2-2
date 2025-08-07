@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useAtom, atom } from "jotai";
+import { useEffect, useMemo } from "react";
 
 /**
  * @param value - 디바운스할 값
@@ -6,7 +7,8 @@ import { useState, useEffect } from "react";
  * @returns 디바운스된 값
  */
 export const useDebounce = <T>(value: T, delay: number): T => {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  const debouncedAtom = useMemo(() => atom<T>(value), []);
+  const [debouncedValue, setDebouncedValue] = useAtom(debouncedAtom);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,7 +18,7 @@ export const useDebounce = <T>(value: T, delay: number): T => {
     return () => {
       clearTimeout(timer);
     };
-  }, [value, delay]);
+  }, [value, delay, setDebouncedValue]);
 
   return debouncedValue;
 };
