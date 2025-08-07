@@ -2,12 +2,8 @@ import React from "react";
 import { NotificationType } from "../../App";
 import { ProductFormData } from "../../models/product";
 import { CloseIcon } from ".././icons";
-import {
-  isValidPrice,
-  isValidStock,
-  safeParseInt,
-  extractNumbers,
-} from "../../utils/validators";
+import { useValidate } from "../../utils/hooks/useValidate";
+import { safeParseInt } from "../../utils/validators";
 
 interface ProductFormProps {
   showProductForm: boolean;
@@ -36,6 +32,8 @@ export const ProductForm = ({
   handleDiscountQuantityChange,
   handleDiscountRateChange,
 }: ProductFormProps) => {
+  const { validatePrice, validateStock, filterNumericInput } = useValidate();
+
   if (!showProductForm) {
     return null;
   }
@@ -43,13 +41,12 @@ export const ProductForm = ({
   const filterPriceInputOnChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value;
-    const numbersOnly = extractNumbers(value);
+    const inputFilter = filterNumericInput(event.target.value);
 
-    if (value === "" || value === numbersOnly) {
+    if (inputFilter.shouldUpdate) {
       setProductForm({
         ...productForm,
-        price: safeParseInt(value),
+        price: inputFilter.filteredValue,
       });
     }
   };
@@ -57,44 +54,32 @@ export const ProductForm = ({
   const filterStockInputOnChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value;
-    const numbersOnly = extractNumbers(value);
+    const inputFilter = filterNumericInput(event.target.value);
 
-    if (value === "" || value === numbersOnly) {
+    if (inputFilter.shouldUpdate) {
       setProductForm({
         ...productForm,
-        stock: safeParseInt(value),
+        stock: inputFilter.filteredValue,
       });
     }
   };
 
   const validatePriceOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    const parsedPrice = safeParseInt(value);
+    const priceValidation = validatePrice(event.target.value);
 
-    if (value === "") {
-      setProductForm({ ...productForm, price: 0 });
-    } else if (!isValidPrice(parsedPrice)) {
-      addNotification("가격은 0보다 커야 합니다", "error");
-      setProductForm({ ...productForm, price: 0 });
+    if (!priceValidation.isValid && priceValidation.error) {
+      addNotification(priceValidation.error, "error");
     }
+    setProductForm({ ...productForm, price: priceValidation.price });
   };
 
   const validateStockOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    const parsedStock = safeParseInt(value);
+    const stockValidation = validateStock(event.target.value);
 
-    if (value === "") {
-      setProductForm({ ...productForm, stock: 0 });
-    } else if (!isValidStock(parsedStock)) {
-      if (parsedStock < 0) {
-        addNotification("재고는 0보다 커야 합니다", "error");
-        setProductForm({ ...productForm, stock: 0 });
-      } else if (parsedStock > 9999) {
-        addNotification("재고는 9999개를 초과할 수 없습니다", "error");
-        setProductForm({ ...productForm, stock: 9999 });
-      }
+    if (!stockValidation.isValid && stockValidation.error) {
+      addNotification(stockValidation.error, "error");
     }
+    setProductForm({ ...productForm, stock: stockValidation.stock });
   };
 
   const updateProductNameOnChange = (

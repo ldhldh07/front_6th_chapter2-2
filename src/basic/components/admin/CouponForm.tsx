@@ -6,11 +6,7 @@ import {
   resetCouponForm,
 } from "../../models/coupon";
 import { NotificationType } from "../../App";
-import {
-  isValidDiscountValue,
-  safeParseInt,
-  extractNumbers,
-} from "../../utils/validators";
+import { useValidate } from "../../utils/hooks/useValidate";
 
 interface CouponFormProps {
   showCouponForm: boolean;
@@ -32,6 +28,8 @@ export const CouponForm = ({
   addCoupon,
   coupons,
 }: CouponFormProps) => {
+  const { validateDiscountValue, filterNumericInput } = useValidate();
+
   const handleCouponSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -56,52 +54,29 @@ export const CouponForm = ({
   const handleDiscountValueBlur = (
     event: React.FocusEvent<HTMLInputElement>
   ) => {
-    const value = safeParseInt(event.target.value);
+    const discountValidation = validateDiscountValue(
+      event.target.value,
+      couponForm.discountType
+    );
 
-    if (!isValidDiscountValue(value, couponForm.discountType)) {
-      if (couponForm.discountType === "percentage") {
-        if (value > 100) {
-          addNotification("할인율은 100%를 초과할 수 없습니다", "error");
-          setCouponForm({
-            ...couponForm,
-            discountValue: 100,
-          });
-        } else if (value < 0) {
-          setCouponForm({
-            ...couponForm,
-            discountValue: 0,
-          });
-        }
-      } else {
-        if (value > 100000) {
-          addNotification(
-            "할인 금액은 100,000원을 초과할 수 없습니다",
-            "error"
-          );
-          setCouponForm({
-            ...couponForm,
-            discountValue: 100000,
-          });
-        } else if (value < 0) {
-          setCouponForm({
-            ...couponForm,
-            discountValue: 0,
-          });
-        }
-      }
+    if (!discountValidation.isValid && discountValidation.error) {
+      addNotification(discountValidation.error, "error");
     }
+    setCouponForm({
+      ...couponForm,
+      discountValue: discountValidation.discountValue,
+    });
   };
 
   const filterDiscountValueOnChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value;
-    const numbersOnly = extractNumbers(value);
+    const inputFilter = filterNumericInput(event.target.value);
 
-    if (value === "" || value === numbersOnly) {
+    if (inputFilter.shouldUpdate) {
       setCouponForm({
         ...couponForm,
-        discountValue: safeParseInt(value),
+        discountValue: inputFilter.filteredValue,
       });
     }
   };
