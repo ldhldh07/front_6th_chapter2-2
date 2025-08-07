@@ -12,6 +12,8 @@ interface UseNotificationsReturn {
   addNotification: (message: string, type?: NotificationType) => void;
   removeNotification: (id: string) => void;
   clearAllNotifications: () => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
 /**
@@ -41,6 +43,20 @@ export const useNotifications = (): UseNotificationsReturn => {
     []
   );
 
+  const onSuccess = useCallback(
+    (message: string) => {
+      addNotification(message, "success");
+    },
+    [addNotification]
+  );
+
+  const onError = useCallback(
+    (message: string) => {
+      addNotification(message, "error");
+    },
+    [addNotification]
+  );
+
   /**
    * 특정 알림 수동 삭제
    */
@@ -60,5 +76,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     addNotification,
     removeNotification,
     clearAllNotifications,
+    onSuccess,
+    onError,
   };
 };

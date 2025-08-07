@@ -1,5 +1,4 @@
 import { Product } from "../../../types";
-import { NotificationType } from "../../App";
 import { ProductWithUI, formatPriceForUser } from "../../models/product";
 import { ImageIcon } from "../icons";
 import { getStockStatus } from "../../utils/validators";
@@ -10,10 +9,12 @@ interface ProductListProps {
   debouncedSearchTerm: string;
   addToCart: (
     product: Product,
-    addNotification: (message: string, type?: NotificationType) => void
+    onSuccess: (message: string) => void,
+    onError: (message: string) => void
   ) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   getStockForProduct: (product: Product) => number;
-  addNotification: (message: string, type?: NotificationType) => void;
 }
 
 export const ProductList = ({
@@ -21,8 +22,9 @@ export const ProductList = ({
   filteredProducts,
   debouncedSearchTerm,
   addToCart,
+  onSuccess,
+  onError,
   getStockForProduct,
-  addNotification,
 }: ProductListProps) => {
   return (
     <section>
@@ -104,7 +106,7 @@ export const ProductList = ({
 
                   {/* 장바구니 버튼 */}
                   <button
-                    onClick={() => addToCart(product, addNotification)}
+                    onClick={() => addToCart(product, onSuccess, onError)}
                     disabled={stockStatus === "soldOut"}
                     className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
                       stockStatus === "soldOut"

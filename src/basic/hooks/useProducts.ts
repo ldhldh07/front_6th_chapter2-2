@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { NotificationType } from "../App";
 import {
   ProductWithUI,
   ProductFormData,
@@ -18,7 +17,7 @@ import { percentToDecimal } from "../utils/formatters";
 
 export const useProducts = (
   initialProducts: ProductWithUI[],
-  addNotification: (message: string, type?: NotificationType) => void
+  onSuccess: (message: string) => void
 ) => {
   const [products, setProducts] = useLocalStorage<ProductWithUI[]>(
     "products",
@@ -31,10 +30,6 @@ export const useProducts = (
 
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
 
-  // ============================================================================
-  // 상품 CRUD 작업
-  // ============================================================================
-
   /**
    * 새 상품 추가
    */
@@ -45,9 +40,9 @@ export const useProducts = (
         generateProductId(Date.now())
       );
       setProducts((prev) => [...prev, product]);
-      addNotification(`상품 "${product.name}"이(가) 추가되었습니다.`);
+      onSuccess(`상품 "${product.name}"이(가) 추가되었습니다.`);
     },
-    [setProducts, addNotification]
+    [setProducts, onSuccess]
   );
 
   /**
@@ -60,9 +55,9 @@ export const useProducts = (
           product.id === productId ? { ...product, ...updates } : product
         )
       );
-      addNotification("상품이 수정되었습니다.");
+      onSuccess("상품이 수정되었습니다.");
     },
-    [setProducts, addNotification]
+    [setProducts, onSuccess]
   );
 
   /**
@@ -71,14 +66,10 @@ export const useProducts = (
   const deleteProduct = useCallback(
     (productId: string) => {
       setProducts((prev) => prev.filter((product) => product.id !== productId));
-      addNotification("상품이 삭제되었습니다.");
+      onSuccess("상품이 삭제되었습니다.");
     },
-    [setProducts, addNotification]
+    [setProducts, onSuccess]
   );
-
-  // ============================================================================
-  // 상품 폼 관리
-  // ============================================================================
 
   /**
    * 상품 편집 시작
@@ -87,10 +78,6 @@ export const useProducts = (
     setEditingProduct(product.id);
     setProductForm(createProductFormFromProduct(product));
   }, []);
-
-  // ============================================================================
-  // 할인 관리
-  // ============================================================================
 
   /**
    * 할인 정보 업데이트 헬퍼 함수

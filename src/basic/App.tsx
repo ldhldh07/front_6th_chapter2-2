@@ -20,7 +20,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const { notifications, addNotification, removeNotification } =
+  const { notifications, onSuccess, onError, removeNotification } =
     useNotifications();
 
   const {
@@ -52,7 +52,8 @@ const App = () => {
   } = useCoupons({
     coupons,
     onUpdateCoupons: setCoupons,
-    addNotification,
+    onSuccess,
+    onError,
     cart,
   });
 
@@ -70,7 +71,7 @@ const App = () => {
     handleDiscountRemove,
     handleDiscountQuantityChange,
     handleDiscountRateChange,
-  } = useProducts(initialProducts, addNotification);
+  } = useProducts(initialProducts, onSuccess);
 
   return (
     <>
@@ -126,13 +127,13 @@ const App = () => {
           <AdminPage
             products={products}
             coupons={coupons}
-            addNotification={addNotification}
             couponForm={couponForm}
             setCouponForm={setCouponForm}
             showCouponForm={showCouponForm}
             setShowCouponForm={setShowCouponForm}
             addCoupon={addCoupon}
             deleteCoupon={deleteCoupon}
+            onError={onError}
             emptyCouponForm={createEmptyCouponForm()}
             productForm={productForm}
             setProductForm={setProductForm}
@@ -152,7 +153,8 @@ const App = () => {
             products={products}
             coupons={coupons}
             debouncedSearchTerm={debouncedSearchTerm}
-            addNotification={addNotification}
+            onSuccess={onSuccess}
+            onError={onError}
             cart={cart}
             selectedCoupon={selectedCoupon}
             setSelectedCoupon={setSelectedCoupon}

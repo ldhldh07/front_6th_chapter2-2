@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Coupon } from "../../types";
-import { NotificationType } from "../App";
 import { CouponForm } from "./admin/CouponForm";
 import {
   ProductWithUI,
@@ -15,13 +14,13 @@ import { CouponList } from "./admin/CouponList";
 interface AdminPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
-  addNotification: (message: string, type?: NotificationType) => void;
   couponForm: CouponFormData;
   setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
   showCouponForm: boolean;
   setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
   addCoupon: (newCoupon: Coupon) => void;
   deleteCoupon: (couponCode: string) => void;
+  onError: (message: string) => void;
   emptyCouponForm: CouponFormData;
   productForm: ProductFormData;
   setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
@@ -40,13 +39,13 @@ interface AdminPageProps {
 export const AdminPage = ({
   products,
   coupons,
-  addNotification,
   couponForm,
   setCouponForm,
   showCouponForm,
   setShowCouponForm,
   addCoupon,
   deleteCoupon,
+  onError,
   emptyCouponForm,
   productForm,
   setProductForm,
@@ -155,7 +154,7 @@ export const AdminPage = ({
               productForm={productForm}
               setProductForm={setProductForm}
               handleProductSubmit={handleSubmitForm}
-              addNotification={addNotification}
+              onError={onError}
               handleCancelClick={handleCancelForm}
               handleDiscountAdd={handleDiscountAdd}
               handleDiscountRemove={handleDiscountRemove}
@@ -181,8 +180,8 @@ export const AdminPage = ({
                 couponForm={couponForm}
                 setCouponForm={setCouponForm}
                 setShowCouponForm={setShowCouponForm}
-                addNotification={addNotification}
                 addCoupon={addCoupon}
+                onError={onError}
                 emptyCouponForm={emptyCouponForm}
                 coupons={coupons}
               />

@@ -1,5 +1,5 @@
 import { Product } from "../../types";
-import { formatAdminPrice, formatUserPrice } from "../utils/formatters";
+import { formatAdminPrice } from "../utils/formatters";
 import { Discount, createEmptyDiscountList } from "./discount";
 import { getStockStatus } from "../utils/validators";
 
@@ -65,7 +65,7 @@ export const formatPriceForAdmin = (product: ProductWithUI): string => {
  */
 export const formatPriceForUser = (product: ProductWithUI): string => {
   if (getStockStatus(product.stock) === "soldOut") return "SOLD OUT";
-  return formatUserPrice(product.price);
+  return `₩${product.price.toLocaleString()}`;
 };
 
 // ============================================================================

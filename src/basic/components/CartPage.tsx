@@ -9,28 +9,25 @@ interface CartPageProps {
   products: ProductWithUI[];
   coupons: Coupon[];
   debouncedSearchTerm: string;
-  addNotification: (message: string, type?: NotificationType) => void;
   cart: CartItem[];
   selectedCoupon: Coupon | null;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   addToCart: (
     product: Product,
-    addNotification: (message: string, type?: NotificationType) => void
+    onSuccess: (message: string) => void,
+    onError: (message: string) => void
   ) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (
     productId: string,
     newQuantity: number,
     products: Product[],
-    addNotification: (message: string, type?: NotificationType) => void
+    onError: (message: string) => void
   ) => void;
-  applyCoupon: (
-    coupon: Coupon,
-    addNotification: (message: string, type?: NotificationType) => void
-  ) => void;
-  completeOrder: (
-    addNotification: (message: string, type?: NotificationType) => void
-  ) => void;
+  applyCoupon: (coupon: Coupon) => void;
+  completeOrder: (onSuccess: (message: string) => void) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   getStockForProduct: (product: Product) => number;
   calculateTotal: (
     cartItems?: CartItem[],
@@ -45,7 +42,6 @@ export const CartPage = ({
   products,
   coupons,
   debouncedSearchTerm,
-  addNotification,
   cart,
   selectedCoupon,
   setSelectedCoupon,
@@ -54,6 +50,8 @@ export const CartPage = ({
   updateQuantity,
   applyCoupon,
   completeOrder,
+  onSuccess,
+  onError,
   getStockForProduct,
   calculateTotal,
 }: CartPageProps) => {
@@ -80,8 +78,9 @@ export const CartPage = ({
           filteredProducts={filteredProducts}
           debouncedSearchTerm={debouncedSearchTerm}
           addToCart={addToCart}
+          onSuccess={onSuccess}
+          onError={onError}
           getStockForProduct={getStockForProduct}
-          addNotification={addNotification}
         />
       </div>
 
@@ -98,7 +97,8 @@ export const CartPage = ({
             setSelectedCoupon={setSelectedCoupon}
             totals={totals}
             completeOrder={completeOrder}
-            addNotification={addNotification}
+            onSuccess={onSuccess}
+            onError={onError}
             products={products}
           />
         </div>

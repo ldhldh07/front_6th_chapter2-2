@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { Coupon, CartItem } from "../../types";
-import { NotificationType } from "../App";
 import {
   CouponFormData,
   createEmptyCouponForm,
@@ -13,7 +12,8 @@ import { calculateCartTotal } from "../models/cart";
 interface UseCouponsProps {
   coupons: Coupon[];
   onUpdateCoupons: (coupons: Coupon[]) => void;
-  addNotification: (message: string, type?: NotificationType) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   cart?: CartItem[];
 }
 
@@ -24,7 +24,8 @@ interface UseCouponsProps {
 export const useCoupons = ({
   coupons,
   onUpdateCoupons,
-  addNotification,
+  onSuccess,
+  onError,
   cart = [],
 }: UseCouponsProps) => {
   const [couponForm, setCouponForm] = useState<CouponFormData>(
@@ -36,17 +37,17 @@ export const useCoupons = ({
   const addCoupon = useCallback(
     (newCoupon: Coupon) => {
       onUpdateCoupons(addCouponToList(coupons, newCoupon));
-      addNotification("쿠폰이 추가되었습니다.", "success");
+      onSuccess("쿠폰이 추가되었습니다.");
     },
-    [coupons, onUpdateCoupons, addNotification]
+    [coupons, onUpdateCoupons, onSuccess]
   );
 
   const deleteCoupon = useCallback(
     (couponCode: string) => {
       onUpdateCoupons(removeCouponFromList(coupons, couponCode));
-      addNotification("쿠폰이 삭제되었습니다.", "success");
+      onSuccess("쿠폰이 삭제되었습니다.");
     },
-    [coupons, onUpdateCoupons, addNotification]
+    [coupons, onUpdateCoupons, onSuccess]
   );
 
   const applyCoupon = useCallback(
@@ -59,14 +60,14 @@ export const useCoupons = ({
       const validation = validateCouponApplication(currentTotal, coupon);
 
       if (!validation.valid) {
-        addNotification(validation.message!, "error");
+        onError(validation.message!);
         return;
       }
 
       setSelectedCoupon(coupon);
-      addNotification("쿠폰이 적용되었습니다.", "success");
+      onSuccess("쿠폰이 적용되었습니다.");
     },
-    [cart, selectedCoupon, addNotification]
+    [cart, selectedCoupon, onSuccess, onError]
   );
 
   return {

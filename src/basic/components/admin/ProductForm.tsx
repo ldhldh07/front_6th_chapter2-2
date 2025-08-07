@@ -1,5 +1,4 @@
 import React from "react";
-import { NotificationType } from "../../App";
 import { ProductFormData } from "../../models/product";
 import { CloseIcon } from ".././icons";
 import { useValidate } from "../../utils/hooks/useValidate";
@@ -11,7 +10,7 @@ interface ProductFormProps {
   productForm: ProductFormData;
   setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
   handleProductSubmit: (e: React.FormEvent) => void;
-  addNotification: (message: string, type?: NotificationType) => void;
+  onError: (message: string) => void;
   handleCancelClick: () => void;
   handleDiscountAdd: () => void;
   handleDiscountRemove: (index: number) => void;
@@ -25,7 +24,7 @@ export const ProductForm = ({
   productForm,
   setProductForm,
   handleProductSubmit,
-  addNotification,
+  onError,
   handleCancelClick,
   handleDiscountAdd,
   handleDiscountRemove,
@@ -68,7 +67,7 @@ export const ProductForm = ({
     const priceValidation = validatePrice(event.target.value);
 
     if (!priceValidation.isValid && priceValidation.error) {
-      addNotification(priceValidation.error, "error");
+      onError(priceValidation.error);
     }
     setProductForm({ ...productForm, price: priceValidation.price });
   };
@@ -77,7 +76,7 @@ export const ProductForm = ({
     const stockValidation = validateStock(event.target.value);
 
     if (!stockValidation.isValid && stockValidation.error) {
-      addNotification(stockValidation.error, "error");
+      onError(stockValidation.error);
     }
     setProductForm({ ...productForm, stock: stockValidation.stock });
   };

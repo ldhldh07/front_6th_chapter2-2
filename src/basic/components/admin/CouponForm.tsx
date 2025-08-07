@@ -5,7 +5,6 @@ import {
   processCouponForm,
   resetCouponForm,
 } from "../../models/coupon";
-import { NotificationType } from "../../App";
 import { useValidate } from "../../utils/hooks/useValidate";
 
 interface CouponFormProps {
@@ -13,8 +12,8 @@ interface CouponFormProps {
   couponForm: CouponFormData;
   setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
   setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
-  addNotification: (message: string, type?: NotificationType) => void;
   addCoupon: (newCoupon: Coupon) => void;
+  onError: (message: string) => void;
   emptyCouponForm: CouponFormData;
   coupons: Coupon[];
 }
@@ -24,8 +23,8 @@ export const CouponForm = ({
   couponForm,
   setCouponForm,
   setShowCouponForm,
-  addNotification,
   addCoupon,
+  onError,
   coupons,
 }: CouponFormProps) => {
   const { validateDiscountValue, filterNumericInput } = useValidate();
@@ -36,7 +35,7 @@ export const CouponForm = ({
     const result = processCouponForm(coupons, couponForm);
 
     if (!result.success) {
-      addNotification(result.message, "error");
+      onError(result.message);
       return;
     }
 
@@ -60,7 +59,7 @@ export const CouponForm = ({
     );
 
     if (!discountValidation.isValid && discountValidation.error) {
-      addNotification(discountValidation.error, "error");
+      onError(discountValidation.error);
     }
     setCouponForm({
       ...couponForm,

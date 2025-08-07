@@ -1,7 +1,7 @@
 import { CartItem, Coupon, Product } from "../../../types";
-import { NotificationType } from "../../App";
 import { CloseIcon, ShoppingBagIcon } from "../icons";
-import { formatUserPrice } from "../../utils/formatters";
+
+import { NotificationType } from "../../App";
 
 interface CartProps {
   cart: CartItem[];
@@ -11,23 +11,19 @@ interface CartProps {
     productId: string,
     newQuantity: number,
     products: Product[],
-    addNotification: (message: string, type?: NotificationType) => void
+    onError: (message: string) => void
   ) => void;
   removeFromCart: (productId: string) => void;
   calculateItemTotal: (item: CartItem, allCartItems: CartItem[]) => number;
-  applyCoupon: (
-    coupon: Coupon,
-    addNotification: (message: string, type?: NotificationType) => void
-  ) => void;
+  applyCoupon: (coupon: Coupon) => void;
   setSelectedCoupon: (coupon: Coupon | null) => void;
   totals: {
     totalBeforeDiscount: number;
     totalAfterDiscount: number;
   };
-  completeOrder: (
-    addNotification: (message: string, type?: NotificationType) => void
-  ) => void;
-  addNotification: (message: string, type?: NotificationType) => void;
+  completeOrder: (onSuccess: (message: string) => void) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   products: Product[];
 }
 
@@ -42,7 +38,8 @@ const Cart = ({
   setSelectedCoupon,
   totals,
   completeOrder,
-  addNotification,
+  onSuccess,
+  onError,
   products,
 }: CartProps) => {
   const handleCouponSelectOnChange = (
@@ -50,7 +47,7 @@ const Cart = ({
   ) => {
     const coupon = coupons.find((coupon) => coupon.code === event.target.value);
     if (coupon) {
-      applyCoupon(coupon, addNotification);
+      applyCoupon(coupon);
     } else {
       setSelectedCoupon(null);
     }
@@ -58,12 +55,12 @@ const Cart = ({
 
   const decreaseQuantityOnClick =
     (productId: string, currentQuantity: number) => () => {
-      updateQuantity(productId, currentQuantity - 1, products, addNotification);
+      updateQuantity(productId, currentQuantity - 1, products, onError);
     };
 
   const increaseQuantityOnClick =
     (productId: string, currentQuantity: number) => () => {
-      updateQuantity(productId, currentQuantity + 1, products, addNotification);
+      updateQuantity(productId, currentQuantity + 1, products, onError);
     };
 
   return (
@@ -135,7 +132,7 @@ const Cart = ({
                         </span>
                       )}
                       <p className="text-sm font-medium text-gray-900">
-                        {formatUserPrice(Math.round(itemTotal))}
+                        {Math.round(itemTotal).toLocaleString()}원
                       </p>
                     </div>
                   </div>
@@ -166,7 +163,7 @@ const Cart = ({
                   <option key={coupon.code} value={coupon.code}>
                     {coupon.name} (
                     {coupon.discountType === "amount"
-                      ? formatUserPrice(coupon.discountValue)
+                      ? `${coupon.discountValue.toLocaleString()}원`
                       : `${coupon.discountValue}%`}
                     )
                   </option>
@@ -181,7 +178,7 @@ const Cart = ({
               <div className="flex justify-between">
                 <span className="text-gray-600">상품 금액</span>
                 <span className="font-medium">
-                  {formatUserPrice(totals.totalBeforeDiscount)}
+                  {totals.totalBeforeDiscount.toLocaleString()}원
                 </span>
               </div>
               {totals.totalBeforeDiscount - totals.totalAfterDiscount > 0 && (
@@ -189,25 +186,26 @@ const Cart = ({
                   <span>할인 금액</span>
                   <span>
                     -
-                    {formatUserPrice(
+                    {(
                       totals.totalBeforeDiscount - totals.totalAfterDiscount
-                    )}
+                    ).toLocaleString()}
+                    원
                   </span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-t border-gray-200">
                 <span className="font-semibold">결제 예정 금액</span>
                 <span className="font-bold text-lg text-gray-900">
-                  {formatUserPrice(totals.totalAfterDiscount)}
+                  {totals.totalAfterDiscount.toLocaleString()}원
                 </span>
               </div>
             </div>
 
             <button
-              onClick={() => completeOrder(addNotification)}
+              onClick={() => completeOrder(onSuccess)}
               className="w-full mt-4 py-3 bg-yellow-400 text-gray-900 rounded-md font-medium hover:bg-yellow-500 transition-colors"
             >
-              {formatUserPrice(totals.totalAfterDiscount)} 결제하기
+              {totals.totalAfterDiscount.toLocaleString()}원 결제하기
             </button>
 
             <div className="mt-3 text-xs text-gray-500 text-center">
