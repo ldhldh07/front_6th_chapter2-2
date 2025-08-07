@@ -2,29 +2,22 @@ import { Product } from "../../../types";
 import { formatPriceForUser } from "../../models/product";
 import { ImageIcon } from "../icons";
 import { getStockStatus } from "../../utils/validators";
-import { useAtom } from "jotai";
-import { productsAtom } from "../../atoms/appAtoms";
+import { useCart } from "../../hooks/useCart";
+import { useProducts } from "../../hooks/useProducts";
 
 interface ProductListProps {
   debouncedSearchTerm: string;
-  addToCart: (
-    product: Product,
-    onSuccess: (message: string) => void,
-    onError: (message: string) => void
-  ) => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
-  getStockForProduct: (product: Product) => number;
 }
 
 export const ProductList = ({
   debouncedSearchTerm,
-  addToCart,
   onSuccess,
   onError,
-  getStockForProduct,
 }: ProductListProps) => {
-  const [products] = useAtom(productsAtom);
+  const { products } = useProducts();
+  const { addToCart, getStockForProduct } = useCart(onSuccess, onError);
 
   const filteredProducts = debouncedSearchTerm
     ? products.filter(
@@ -118,7 +111,7 @@ export const ProductList = ({
 
                   {/* 장바구니 버튼 */}
                   <button
-                    onClick={() => addToCart(product, onSuccess, onError)}
+                    onClick={() => addToCart(product)}
                     disabled={stockStatus === "soldOut"}
                     className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
                       stockStatus === "soldOut"

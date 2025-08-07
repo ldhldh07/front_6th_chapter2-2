@@ -1,91 +1,75 @@
-import { useState, useEffect, useCallback } from "react";
+import { useAtom, useSetAtom } from "jotai";
+import { useCallback } from "react";
 import { CartItem, Product, Coupon } from "../../types";
+import { getRemainingStock, calculateCartTotal } from "../models/cart";
+import { cartAtom } from "../atoms/appAtoms";
 import {
-  addItemToCart,
-  removeItemFromCart,
-  updateCartItemQuantity,
-  getRemainingStock,
-  calculateTotalItemCount,
-  calculateCartTotal,
-  generateOrderNumber,
-  isStockExceeded,
-  findCartItemByProductId,
-} from "../models/cart";
-import { findProductById } from "../models/product";
-import { useLocalStorage } from "../utils/hooks/useLocalStorage";
+  addToCartActionAtom,
+  removeFromCartActionAtom,
+  updateQuantityActionAtom,
+  completeOrderActionAtom,
+  cartItemCountAtom,
+} from "../atoms/cartActions";
 
-export const useCart = () => {
-  const [cart, setCart] = useLocalStorage<CartItem[]>("cart", []);
-  const [cartItemCount, setCartItemCount] = useState(0);
+export const useCart = (
+  onSuccess?: (message: string) => void,
+  onError?: (message: string) => void
+) => {
+  // Atom states
+  const [cart, setCart] = useAtom(cartAtom);
+  const [cartItemCount] = useAtom(cartItemCountAtom);
 
-  useEffect(() => {
-    const count = calculateTotalItemCount(cart);
-    setCartItemCount(count);
-  }, [cart]);
+  // Atom actions
+  const addToCartAction = useSetAtom(addToCartActionAtom);
+  const removeFromCartAction = useSetAtom(removeFromCartActionAtom);
+  const updateQuantityAction = useSetAtom(updateQuantityActionAtom);
+  const completeOrderAction = useSetAtom(completeOrderActionAtom);
 
   const addToCart = useCallback(
-    (
-      product: Product,
-      onSuccess: (message: string) => void,
-      onError: (message: string) => void
-    ) => {
-      const remainingStock = getRemainingStock(product, cart);
-      if (remainingStock <= 0) {
-        onError("재고가 부족합니다!");
-        return;
+    (product: Product) => {
+      if (onSuccess && onError) {
+        addToCartAction({ product, onSuccess, onError });
+      } else {
+        addToCartAction({
+          product,
+          onSuccess: () => {},
+          onError: () => {},
+        });
       }
-
-      const newCart = addItemToCart(cart, product);
-      const addedItem = findCartItemByProductId(newCart, product.id);
-
-      if (addedItem && isStockExceeded(addedItem.quantity, product.stock)) {
-        onError(`재고는 ${product.stock}개까지만 있습니다.`);
-        return;
-      }
-
-      setCart(newCart);
-      onSuccess("장바구니에 담았습니다");
     },
-    [cart]
+    [addToCartAction, onSuccess, onError]
   );
 
   const removeFromCart = useCallback(
     (productId: string) => {
-      setCart(removeItemFromCart(cart, productId));
+      removeFromCartAction(productId);
     },
-    [cart]
+    [removeFromCartAction]
   );
 
   const updateQuantity = useCallback(
-    (
-      productId: string,
-      newQuantity: number,
-      products: Product[],
-      onError: (message: string) => void
-    ) => {
-      if (newQuantity <= 0) {
-        setCart(removeItemFromCart(cart, productId));
-        return;
+    (productId: string, newQuantity: number, products: Product[]) => {
+      if (onError) {
+        updateQuantityAction({ productId, newQuantity, products, onError });
+      } else {
+        updateQuantityAction({
+          productId,
+          newQuantity,
+          products,
+          onError: () => {},
+        });
       }
-
-      const product = findProductById(products, productId);
-      if (!product) return;
-
-      if (isStockExceeded(newQuantity, product.stock)) {
-        onError(`재고는 ${product.stock}개까지만 있습니다.`);
-        return;
-      }
-
-      setCart(updateCartItemQuantity(cart, productId, newQuantity));
     },
-    [cart]
+    [updateQuantityAction, onError]
   );
 
-  const completeOrder = useCallback((onSuccess: (message: string) => void) => {
-    const orderNumber = generateOrderNumber(Date.now());
-    onSuccess(`주문이 완료되었습니다. 주문번호: ${orderNumber}`);
-    setCart([]);
-  }, []);
+  const completeOrder = useCallback(() => {
+    if (onSuccess) {
+      completeOrderAction(onSuccess);
+    } else {
+      completeOrderAction(() => {});
+    }
+  }, [completeOrderAction, onSuccess]);
 
   const getStockForProduct = useCallback(
     (product: Product): number => {
@@ -105,10 +89,12 @@ export const useCart = () => {
     cart,
     setCart,
     cartItemCount,
+
     addToCart,
     removeFromCart,
     updateQuantity,
     completeOrder,
+
     getStockForProduct,
     calculateTotal,
   };

@@ -22,16 +22,7 @@ const App = () => {
   const { notifications, onSuccess, onError, removeNotification } =
     useNotifications();
 
-  const {
-    cart,
-    cartItemCount,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    completeOrder,
-    getStockForProduct,
-    calculateTotal,
-  } = useCart();
+  const { cart, cartItemCount } = useCart(onSuccess, onError);
 
   const [coupons, setCoupons] = useLocalStorage<Coupon[]>(
     "coupons",
@@ -122,18 +113,11 @@ const App = () => {
         ) : (
           <CartPage
             coupons={coupons}
-            onSuccess={onSuccess}
-            onError={onError}
-            cart={cart}
             selectedCoupon={selectedCoupon}
             setSelectedCoupon={setSelectedCoupon}
-            addToCart={addToCart}
-            removeFromCart={removeFromCart}
-            updateQuantity={updateQuantity}
             applyCoupon={applyCoupon}
-            completeOrder={completeOrder}
-            getStockForProduct={getStockForProduct}
-            calculateTotal={calculateTotal}
+            onSuccess={onSuccess}
+            onError={onError}
           />
         )}
       </main>

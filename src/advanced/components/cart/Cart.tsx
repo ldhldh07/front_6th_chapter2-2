@@ -1,47 +1,36 @@
-import { CartItem, Coupon, Product } from "../../../types";
+import { Coupon } from "../../../types";
 import { CloseIcon, ShoppingBagIcon } from "../icons";
 import { formatKoreanWon } from "../../utils/formatters";
-import { useAtom } from "jotai";
-import { productsAtom } from "../../atoms/appAtoms";
+import { calculateItemTotal } from "../../models/cart";
+import { useCart } from "../../hooks/useCart";
+import { useProducts } from "../../hooks/useProducts";
 
 interface CartProps {
-  cart: CartItem[];
   coupons: Coupon[];
   selectedCoupon: Coupon | null;
-  updateQuantity: (
-    productId: string,
-    newQuantity: number,
-    products: Product[],
-    onError: (message: string) => void
-  ) => void;
-  removeFromCart: (productId: string) => void;
-  calculateItemTotal: (item: CartItem, allCartItems: CartItem[]) => number;
-  applyCoupon: (coupon: Coupon) => void;
   setSelectedCoupon: (coupon: Coupon | null) => void;
-  totals: {
-    totalBeforeDiscount: number;
-    totalAfterDiscount: number;
-  };
-  completeOrder: (onSuccess: (message: string) => void) => void;
+  applyCoupon: (coupon: Coupon) => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
 
 const Cart = ({
-  cart,
   coupons,
   selectedCoupon,
-  updateQuantity,
-  removeFromCart,
-  calculateItemTotal,
-  applyCoupon,
   setSelectedCoupon,
-  totals,
-  completeOrder,
+  applyCoupon,
   onSuccess,
   onError,
 }: CartProps) => {
-  const [products] = useAtom(productsAtom);
+  const {
+    cart,
+    removeFromCart,
+    updateQuantity,
+    completeOrder,
+    calculateTotal,
+  } = useCart(onSuccess, onError);
+
+  const { products } = useProducts();
 
   const handleCouponSelectOnChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -56,13 +45,15 @@ const Cart = ({
 
   const decreaseQuantityOnClick =
     (productId: string, currentQuantity: number) => () => {
-      updateQuantity(productId, currentQuantity - 1, products, onError);
+      updateQuantity(productId, currentQuantity - 1, products);
     };
 
   const increaseQuantityOnClick =
     (productId: string, currentQuantity: number) => () => {
-      updateQuantity(productId, currentQuantity + 1, products, onError);
+      updateQuantity(productId, currentQuantity + 1, products);
     };
+
+  const totals = calculateTotal(cart, selectedCoupon);
 
   return (
     <>
@@ -202,7 +193,7 @@ const Cart = ({
             </div>
 
             <button
-              onClick={() => completeOrder(onSuccess)}
+              onClick={() => completeOrder()}
               className="w-full mt-4 py-3 bg-yellow-400 text-gray-900 rounded-md font-medium hover:bg-yellow-500 transition-colors"
             >
               {formatKoreanWon(totals.totalAfterDiscount)} 결제하기

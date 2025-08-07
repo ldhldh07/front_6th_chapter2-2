@@ -6,6 +6,7 @@ import {
   createEmptyProductForm,
 } from "../models/product";
 import { initialProducts } from "../constants";
+import { CartItem } from "../../types";
 
 /**
  * 관리자 모드 상태
@@ -41,3 +42,8 @@ export const productFormAtom = atom<ProductFormData>(createEmptyProductForm());
  * 편집 중인 상품 ID
  */
 export const editingProductAtom = atom<string | null>(null);
+
+/**
+ * 장바구니 상태 (localStorage 자동 연동)
+ */
+export const cartAtom = atomWithStorage<CartItem[]>("cart", []);
