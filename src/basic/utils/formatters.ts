@@ -13,6 +13,13 @@ export const formatUserPrice = (price: number): string => {
 };
 
 /**
+ * 원화 단위 포맷팅 (원 표시)
+ */
+export const formatKoreanWon = (price: number): string => {
+  return `${price.toLocaleString()}원`;
+};
+
+/**
  * 퍼센트를 소수로 변환
  */
 export const percentToDecimal = (percent: number): number => percent / 100;

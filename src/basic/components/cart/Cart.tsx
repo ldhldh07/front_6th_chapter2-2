@@ -1,7 +1,6 @@
 import { CartItem, Coupon, Product } from "../../../types";
 import { CloseIcon, ShoppingBagIcon } from "../icons";
-
-import { NotificationType } from "../../App";
+import { formatKoreanWon } from "../../utils/formatters";
 
 interface CartProps {
   cart: CartItem[];
@@ -132,7 +131,7 @@ const Cart = ({
                         </span>
                       )}
                       <p className="text-sm font-medium text-gray-900">
-                        {Math.round(itemTotal).toLocaleString()}원
+                        {formatKoreanWon(Math.round(itemTotal))}
                       </p>
                     </div>
                   </div>
@@ -163,7 +162,7 @@ const Cart = ({
                   <option key={coupon.code} value={coupon.code}>
                     {coupon.name} (
                     {coupon.discountType === "amount"
-                      ? `${coupon.discountValue.toLocaleString()}원`
+                      ? formatKoreanWon(coupon.discountValue)
                       : `${coupon.discountValue}%`}
                     )
                   </option>
@@ -178,7 +177,7 @@ const Cart = ({
               <div className="flex justify-between">
                 <span className="text-gray-600">상품 금액</span>
                 <span className="font-medium">
-                  {totals.totalBeforeDiscount.toLocaleString()}원
+                  {formatKoreanWon(totals.totalBeforeDiscount)}
                 </span>
               </div>
               {totals.totalBeforeDiscount - totals.totalAfterDiscount > 0 && (
@@ -186,17 +185,16 @@ const Cart = ({
                   <span>할인 금액</span>
                   <span>
                     -
-                    {(
+                    {formatKoreanWon(
                       totals.totalBeforeDiscount - totals.totalAfterDiscount
-                    ).toLocaleString()}
-                    원
+                    )}
                   </span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-t border-gray-200">
                 <span className="font-semibold">결제 예정 금액</span>
                 <span className="font-bold text-lg text-gray-900">
-                  {totals.totalAfterDiscount.toLocaleString()}원
+                  {formatKoreanWon(totals.totalAfterDiscount)}
                 </span>
               </div>
             </div>
@@ -205,7 +203,7 @@ const Cart = ({
               onClick={() => completeOrder(onSuccess)}
               className="w-full mt-4 py-3 bg-yellow-400 text-gray-900 rounded-md font-medium hover:bg-yellow-500 transition-colors"
             >
-              {totals.totalAfterDiscount.toLocaleString()}원 결제하기
+              {formatKoreanWon(totals.totalAfterDiscount)} 결제하기
             </button>
 
             <div className="mt-3 text-xs text-gray-500 text-center">
