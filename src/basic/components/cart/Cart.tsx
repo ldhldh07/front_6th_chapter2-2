@@ -1,6 +1,7 @@
 import { CartItem, Coupon, Product } from "../../../types";
 import { NotificationType } from "../../App";
 import { CloseIcon, ShoppingBagIcon } from "../icons";
+import { formatUserPrice } from "../../utils/formatters";
 
 interface CartProps {
   cart: CartItem[];
@@ -44,6 +45,27 @@ const Cart = ({
   addNotification,
   products,
 }: CartProps) => {
+  const handleCouponSelectOnChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const coupon = coupons.find((coupon) => coupon.code === event.target.value);
+    if (coupon) {
+      applyCoupon(coupon, addNotification);
+    } else {
+      setSelectedCoupon(null);
+    }
+  };
+
+  const decreaseQuantityOnClick =
+    (productId: string, currentQuantity: number) => () => {
+      updateQuantity(productId, currentQuantity - 1, products, addNotification);
+    };
+
+  const increaseQuantityOnClick =
+    (productId: string, currentQuantity: number) => () => {
+      updateQuantity(productId, currentQuantity + 1, products, addNotification);
+    };
+
   return (
     <>
       <section className="bg-white rounded-lg border border-gray-200 p-4">
@@ -85,14 +107,10 @@ const Cart = ({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <button
-                        onClick={() =>
-                          updateQuantity(
-                            item.product.id,
-                            item.quantity - 1,
-                            products,
-                            addNotification
-                          )
-                        }
+                        onClick={decreaseQuantityOnClick(
+                          item.product.id,
+                          item.quantity
+                        )}
                         className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                       >
                         <span className="text-xs">−</span>
@@ -101,14 +119,10 @@ const Cart = ({
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() =>
-                          updateQuantity(
-                            item.product.id,
-                            item.quantity + 1,
-                            products,
-                            addNotification
-                          )
-                        }
+                        onClick={increaseQuantityOnClick(
+                          item.product.id,
+                          item.quantity
+                        )}
                         className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                       >
                         <span className="text-xs">+</span>
@@ -121,7 +135,7 @@ const Cart = ({
                         </span>
                       )}
                       <p className="text-sm font-medium text-gray-900">
-                        {Math.round(itemTotal).toLocaleString()}원
+                        {formatUserPrice(Math.round(itemTotal))}
                       </p>
                     </div>
                   </div>
@@ -145,18 +159,14 @@ const Cart = ({
               <select
                 className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
                 value={selectedCoupon?.code || ""}
-                onChange={(e) => {
-                  const coupon = coupons.find((c) => c.code === e.target.value);
-                  if (coupon) applyCoupon(coupon, addNotification);
-                  else setSelectedCoupon(null);
-                }}
+                onChange={handleCouponSelectOnChange}
               >
                 <option value="">쿠폰 선택</option>
                 {coupons.map((coupon) => (
                   <option key={coupon.code} value={coupon.code}>
                     {coupon.name} (
                     {coupon.discountType === "amount"
-                      ? `${coupon.discountValue.toLocaleString()}원`
+                      ? formatUserPrice(coupon.discountValue)
                       : `${coupon.discountValue}%`}
                     )
                   </option>
@@ -171,7 +181,7 @@ const Cart = ({
               <div className="flex justify-between">
                 <span className="text-gray-600">상품 금액</span>
                 <span className="font-medium">
-                  {totals.totalBeforeDiscount.toLocaleString()}원
+                  {formatUserPrice(totals.totalBeforeDiscount)}
                 </span>
               </div>
               {totals.totalBeforeDiscount - totals.totalAfterDiscount > 0 && (
@@ -179,17 +189,16 @@ const Cart = ({
                   <span>할인 금액</span>
                   <span>
                     -
-                    {(
+                    {formatUserPrice(
                       totals.totalBeforeDiscount - totals.totalAfterDiscount
-                    ).toLocaleString()}
-                    원
+                    )}
                   </span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-t border-gray-200">
                 <span className="font-semibold">결제 예정 금액</span>
                 <span className="font-bold text-lg text-gray-900">
-                  {totals.totalAfterDiscount.toLocaleString()}원
+                  {formatUserPrice(totals.totalAfterDiscount)}
                 </span>
               </div>
             </div>
@@ -198,7 +207,7 @@ const Cart = ({
               onClick={() => completeOrder(addNotification)}
               className="w-full mt-4 py-3 bg-yellow-400 text-gray-900 rounded-md font-medium hover:bg-yellow-500 transition-colors"
             >
-              {totals.totalAfterDiscount.toLocaleString()}원 결제하기
+              {formatUserPrice(totals.totalAfterDiscount)} 결제하기
             </button>
 
             <div className="mt-3 text-xs text-gray-500 text-center">

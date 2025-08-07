@@ -53,8 +53,10 @@ export const CouponForm = ({
     setShowCouponForm(false);
   };
 
-  const handleDiscountValueBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const value = safeParseInt(e.target.value);
+  const handleDiscountValueBlur = (
+    event: React.FocusEvent<HTMLInputElement>
+  ) => {
+    const value = safeParseInt(event.target.value);
 
     if (!isValidDiscountValue(value, couponForm.discountType)) {
       if (couponForm.discountType === "percentage") {
@@ -90,6 +92,47 @@ export const CouponForm = ({
     }
   };
 
+  const filterDiscountValueOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    const numbersOnly = extractNumbers(value);
+
+    if (value === "" || value === numbersOnly) {
+      setCouponForm({
+        ...couponForm,
+        discountValue: safeParseInt(value),
+      });
+    }
+  };
+
+  const updateCouponNameOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCouponForm({
+      ...couponForm,
+      name: event.target.value,
+    });
+  };
+
+  const updateCouponCodeOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCouponForm({
+      ...couponForm,
+      code: event.target.value.toUpperCase(),
+    });
+  };
+
+  const updateDiscountTypeOnChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setCouponForm({
+      ...couponForm,
+      discountType: event.target.value as "amount" | "percentage",
+    });
+  };
+
   if (!showCouponForm) {
     return null;
   }
@@ -106,12 +149,7 @@ export const CouponForm = ({
             <input
               type="text"
               value={couponForm.name}
-              onChange={(e) =>
-                setCouponForm({
-                  ...couponForm,
-                  name: e.target.value,
-                })
-              }
+              onChange={updateCouponNameOnChange}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border text-sm"
               placeholder="신규 가입 쿠폰"
               required
@@ -124,12 +162,7 @@ export const CouponForm = ({
             <input
               type="text"
               value={couponForm.code}
-              onChange={(e) =>
-                setCouponForm({
-                  ...couponForm,
-                  code: e.target.value.toUpperCase(),
-                })
-              }
+              onChange={updateCouponCodeOnChange}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border text-sm font-mono"
               placeholder="WELCOME2024"
               required
@@ -141,12 +174,7 @@ export const CouponForm = ({
             </label>
             <select
               value={couponForm.discountType}
-              onChange={(e) =>
-                setCouponForm({
-                  ...couponForm,
-                  discountType: e.target.value as "amount" | "percentage",
-                })
-              }
+              onChange={updateDiscountTypeOnChange}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border text-sm"
             >
               <option value="amount">정액 할인</option>
@@ -162,16 +190,7 @@ export const CouponForm = ({
               value={
                 couponForm.discountValue === 0 ? "" : couponForm.discountValue
               }
-              onChange={(e) => {
-                const value = e.target.value;
-                const numbersOnly = extractNumbers(value);
-                if (value === "" || value === numbersOnly) {
-                  setCouponForm({
-                    ...couponForm,
-                    discountValue: safeParseInt(value),
-                  });
-                }
-              }}
+              onChange={filterDiscountValueOnChange}
               onBlur={handleDiscountValueBlur}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border text-sm"
               placeholder={couponForm.discountType === "amount" ? "5000" : "10"}

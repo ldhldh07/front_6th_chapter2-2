@@ -40,6 +40,81 @@ export const ProductForm = ({
     return null;
   }
 
+  const filterPriceInputOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    const numbersOnly = extractNumbers(value);
+
+    if (value === "" || value === numbersOnly) {
+      setProductForm({
+        ...productForm,
+        price: safeParseInt(value),
+      });
+    }
+  };
+
+  const filterStockInputOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    const numbersOnly = extractNumbers(value);
+
+    if (value === "" || value === numbersOnly) {
+      setProductForm({
+        ...productForm,
+        stock: safeParseInt(value),
+      });
+    }
+  };
+
+  const validatePriceOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const parsedPrice = safeParseInt(value);
+
+    if (value === "") {
+      setProductForm({ ...productForm, price: 0 });
+    } else if (!isValidPrice(parsedPrice)) {
+      addNotification("가격은 0보다 커야 합니다", "error");
+      setProductForm({ ...productForm, price: 0 });
+    }
+  };
+
+  const validateStockOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const parsedStock = safeParseInt(value);
+
+    if (value === "") {
+      setProductForm({ ...productForm, stock: 0 });
+    } else if (!isValidStock(parsedStock)) {
+      if (parsedStock < 0) {
+        addNotification("재고는 0보다 커야 합니다", "error");
+        setProductForm({ ...productForm, stock: 0 });
+      } else if (parsedStock > 9999) {
+        addNotification("재고는 9999개를 초과할 수 없습니다", "error");
+        setProductForm({ ...productForm, stock: 9999 });
+      }
+    }
+  };
+
+  const updateProductNameOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setProductForm({
+      ...productForm,
+      name: event.target.value,
+    });
+  };
+
+  const updateProductDescriptionOnChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setProductForm({
+      ...productForm,
+      description: event.target.value,
+    });
+  };
+
   return (
     <div className="p-6 border-t border-gray-200 bg-gray-50">
       <form onSubmit={handleProductSubmit} className="space-y-4">
@@ -54,12 +129,7 @@ export const ProductForm = ({
             <input
               type="text"
               value={productForm.name}
-              onChange={(e) =>
-                setProductForm({
-                  ...productForm,
-                  name: e.target.value,
-                })
-              }
+              onChange={updateProductNameOnChange}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"
               required
             />
@@ -71,12 +141,7 @@ export const ProductForm = ({
             <input
               type="text"
               value={productForm.description}
-              onChange={(e) =>
-                setProductForm({
-                  ...productForm,
-                  description: e.target.value,
-                })
-              }
+              onChange={updateProductDescriptionOnChange}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"
             />
           </div>
@@ -87,27 +152,8 @@ export const ProductForm = ({
             <input
               type="text"
               value={productForm.price === 0 ? "" : productForm.price}
-              onChange={(e) => {
-                const value = e.target.value;
-                const numbersOnly = extractNumbers(value);
-                if (value === "" || value === numbersOnly) {
-                  setProductForm({
-                    ...productForm,
-                    price: safeParseInt(value),
-                  });
-                }
-              }}
-              onBlur={(e) => {
-                const value = e.target.value;
-                const parsedPrice = safeParseInt(value);
-
-                if (value === "") {
-                  setProductForm({ ...productForm, price: 0 });
-                } else if (!isValidPrice(parsedPrice)) {
-                  addNotification("가격은 0보다 커야 합니다", "error");
-                  setProductForm({ ...productForm, price: 0 });
-                }
-              }}
+              onChange={filterPriceInputOnChange}
+              onBlur={validatePriceOnBlur}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"
               placeholder="숫자만 입력"
               required
@@ -120,35 +166,8 @@ export const ProductForm = ({
             <input
               type="text"
               value={productForm.stock === 0 ? "" : productForm.stock}
-              onChange={(e) => {
-                const value = e.target.value;
-                const numbersOnly = extractNumbers(value);
-                if (value === "" || value === numbersOnly) {
-                  setProductForm({
-                    ...productForm,
-                    stock: safeParseInt(value),
-                  });
-                }
-              }}
-              onBlur={(e) => {
-                const value = e.target.value;
-                const parsedStock = safeParseInt(value);
-
-                if (value === "") {
-                  setProductForm({ ...productForm, stock: 0 });
-                } else if (!isValidStock(parsedStock)) {
-                  if (parsedStock < 0) {
-                    addNotification("재고는 0보다 커야 합니다", "error");
-                    setProductForm({ ...productForm, stock: 0 });
-                  } else if (parsedStock > 9999) {
-                    addNotification(
-                      "재고는 9999개를 초과할 수 없습니다",
-                      "error"
-                    );
-                    setProductForm({ ...productForm, stock: 9999 });
-                  }
-                }
-              }}
+              onChange={filterStockInputOnChange}
+              onBlur={validateStockOnBlur}
               className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2 border"
               placeholder="숫자만 입력"
               required
