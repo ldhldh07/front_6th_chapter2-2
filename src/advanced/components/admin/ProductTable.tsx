@@ -3,16 +3,11 @@ import { getStockStatus } from "../../utils/validators";
 import { useProducts } from "../../hooks/useProducts";
 
 interface ProductTableProps {
-  onSuccess: (message: string) => void;
   setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const ProductTable = ({
-  onSuccess,
-  setShowProductForm,
-}: ProductTableProps) => {
-  const { products, deleteProduct } = useProducts(onSuccess);
-  const { startEditProductAction } = useProducts(onSuccess);
+export const ProductTable = ({ setShowProductForm }: ProductTableProps) => {
+  const { products, deleteProduct, startEditProductAction } = useProducts();
   const handleStartEditProduct = (product: ProductWithUI) => {
     startEditProductAction(product);
     setShowProductForm(true);

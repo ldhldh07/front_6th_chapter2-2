@@ -13,27 +13,19 @@ import {
 } from "../models/cart";
 import { findProductById } from "../models/product";
 import { cartAtom } from "./appAtoms";
+import {
+  addSuccessNotificationActionAtom,
+  addErrorNotificationActionAtom,
+} from "./notificationActions";
 
 export const addToCartActionAtom = atom(
   null,
-  (
-    get,
-    set,
-    {
-      product,
-      onSuccess,
-      onError,
-    }: {
-      product: Product;
-      onSuccess: (message: string) => void;
-      onError: (message: string) => void;
-    }
-  ) => {
+  (get, set, { product }: { product: Product }) => {
     const cart = get(cartAtom);
     const remainingStock = getRemainingStock(product, cart);
 
     if (remainingStock <= 0) {
-      onError("재고가 부족합니다!");
+      set(addErrorNotificationActionAtom, "재고가 부족합니다!");
       return;
     }
 
@@ -41,12 +33,15 @@ export const addToCartActionAtom = atom(
     const addedItem = findCartItemByProductId(newCart, product.id);
 
     if (addedItem && isStockExceeded(addedItem.quantity, product.stock)) {
-      onError(`재고는 ${product.stock}개까지만 있습니다.`);
+      set(
+        addErrorNotificationActionAtom,
+        `재고는 ${product.stock}개까지만 있습니다.`
+      );
       return;
     }
 
     set(cartAtom, newCart);
-    onSuccess("장바구니에 담았습니다");
+    set(addSuccessNotificationActionAtom, "장바구니에 담았습니다");
   }
 );
 
@@ -67,12 +62,10 @@ export const updateQuantityActionAtom = atom(
       productId,
       newQuantity,
       products,
-      onError,
     }: {
       productId: string;
       newQuantity: number;
       products: Product[];
-      onError: (message: string) => void;
     }
   ) => {
     const cart = get(cartAtom);
@@ -86,7 +79,10 @@ export const updateQuantityActionAtom = atom(
     if (!product) return;
 
     if (isStockExceeded(newQuantity, product.stock)) {
-      onError(`재고는 ${product.stock}개까지만 있습니다.`);
+      set(
+        addErrorNotificationActionAtom,
+        `재고는 ${product.stock}개까지만 있습니다.`
+      );
       return;
     }
 
@@ -94,14 +90,14 @@ export const updateQuantityActionAtom = atom(
   }
 );
 
-export const completeOrderActionAtom = atom(
-  null,
-  (_get, set, onSuccess: (message: string) => void) => {
-    const orderNumber = generateOrderNumber(Date.now());
-    onSuccess(`주문이 완료되었습니다. 주문번호: ${orderNumber}`);
-    set(cartAtom, []);
-  }
-);
+export const completeOrderActionAtom = atom(null, (_get, set) => {
+  const orderNumber = generateOrderNumber(Date.now());
+  set(
+    addSuccessNotificationActionAtom,
+    `주문이 완료되었습니다. 주문번호: ${orderNumber}`
+  );
+  set(cartAtom, []);
+});
 
 export const cartItemCountAtom = atom((get) => {
   const cart = get(cartAtom);

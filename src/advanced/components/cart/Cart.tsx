@@ -5,22 +5,17 @@ import { useCart } from "../../hooks/useCart";
 import { useProducts } from "../../hooks/useProducts";
 import { useCoupons } from "../../hooks/useCoupons";
 
-interface CartProps {
-  onSuccess: (message: string) => void;
-  onError: (message: string) => void;
-}
-
-const Cart = ({ onSuccess, onError }: CartProps) => {
+const Cart = () => {
   const {
     cart,
     removeFromCart,
     updateQuantity,
     completeOrder,
     calculateTotal,
-  } = useCart(onSuccess, onError);
+  } = useCart();
   const { products } = useProducts();
   const { coupons, selectedCoupon, setSelectedCoupon, applyCoupon } =
-    useCoupons(onSuccess);
+    useCoupons();
 
   const handleCouponSelectOnChange = (
     event: React.ChangeEvent<HTMLSelectElement>

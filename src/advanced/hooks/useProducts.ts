@@ -17,7 +17,7 @@ import {
 } from "../atoms/appAtoms";
 import { percentToDecimal } from "../utils/formatters";
 
-export const useProducts = (onSuccess?: (message: string) => void) => {
+export const useProducts = () => {
   // Atom states
   const [products, setProducts] = useAtom(productsAtom);
   const [productForm, setProductForm] = useAtom(productFormAtom);
@@ -36,29 +36,18 @@ export const useProducts = (onSuccess?: (message: string) => void) => {
   const updateDiscountRateAction = useSetAtom(updateDiscountRateActionAtom);
 
   const addProduct = (newProduct: Omit<ProductWithUI, "id">) => {
-    if (onSuccess) {
-      addProductAction({ newProduct, onSuccess });
-    } else {
-      addProductAction({ newProduct, onSuccess: () => {} });
-    }
+    addProductAction({ newProduct });
   };
 
   const updateProduct = (
     productId: string,
     updates: Partial<ProductWithUI>
   ) => {
-    if (onSuccess) {
-      updateProductAction({ productId, updates, onSuccess });
-    } else {
-      updateProductAction({ productId, updates, onSuccess: () => {} });
-    }
+    updateProductAction({ productId, updates });
   };
 
   const deleteProduct = (productId: string) => {
     deleteProductAction(productId);
-    if (onSuccess) {
-      onSuccess("상품이 삭제되었습니다.");
-    }
   };
 
   return {

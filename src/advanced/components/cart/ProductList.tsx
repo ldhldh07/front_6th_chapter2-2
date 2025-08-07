@@ -7,17 +7,12 @@ import { useDebounce } from "../../utils/hooks/useDebounce";
 import { useAtom } from "jotai";
 import { searchTermAtom } from "../../atoms/appAtoms";
 
-interface ProductListProps {
-  onSuccess: (message: string) => void;
-  onError: (message: string) => void;
-}
-
-export const ProductList = ({ onSuccess, onError }: ProductListProps) => {
+export const ProductList = () => {
   const [searchTerm] = useAtom(searchTermAtom);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { products } = useProducts();
-  const { addToCart, getStockForProduct } = useCart(onSuccess, onError);
+  const { addToCart, getStockForProduct } = useCart();
 
   const filteredProducts = debouncedSearchTerm
     ? products.filter(

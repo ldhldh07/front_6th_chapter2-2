@@ -1,11 +1,16 @@
-import { useState, useCallback } from "react";
-import { NotificationType } from "../App";
-
-export interface Notification {
-  id: string;
-  message: string;
-  type: NotificationType;
-}
+import { useAtom, useSetAtom } from "jotai";
+import { useCallback } from "react";
+import {
+  notificationsAtom,
+  Notification,
+  NotificationType,
+} from "../atoms/appAtoms";
+import {
+  addNotificationActionAtom,
+  removeNotificationActionAtom,
+  addSuccessNotificationActionAtom,
+  addErrorNotificationActionAtom,
+} from "../atoms/notificationActions";
 
 interface UseNotificationsReturn {
   notifications: Notification[];
@@ -23,7 +28,14 @@ interface UseNotificationsReturn {
  * - 수동 삭제 기능
  */
 export const useNotifications = (): UseNotificationsReturn => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useAtom(notificationsAtom);
+
+  const addNotificationAction = useSetAtom(addNotificationActionAtom);
+  const removeNotificationAction = useSetAtom(removeNotificationActionAtom);
+  const addSuccessNotificationAction = useSetAtom(
+    addSuccessNotificationActionAtom
+  );
+  const addErrorNotificationAction = useSetAtom(addErrorNotificationActionAtom);
 
   /**
    * 새 알림 추가
@@ -31,45 +43,41 @@ export const useNotifications = (): UseNotificationsReturn => {
    */
   const addNotification = useCallback(
     (message: string, type: NotificationType = "success") => {
-      const id = Date.now().toString();
-      const newNotification: Notification = { id, message, type };
-
-      setNotifications((prev) => [...prev, newNotification]);
-
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }, 3000);
+      addNotificationAction({ message, type });
     },
-    []
+    [addNotificationAction]
   );
 
   const onSuccess = useCallback(
     (message: string) => {
-      addNotification(message, "success");
+      addSuccessNotificationAction(message);
     },
-    [addNotification]
+    [addSuccessNotificationAction]
   );
 
   const onError = useCallback(
     (message: string) => {
-      addNotification(message, "error");
+      addErrorNotificationAction(message);
     },
-    [addNotification]
+    [addErrorNotificationAction]
   );
 
   /**
    * 특정 알림 수동 삭제
    */
-  const removeNotification = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  }, []);
+  const removeNotification = useCallback(
+    (id: string) => {
+      removeNotificationAction(id);
+    },
+    [removeNotificationAction]
+  );
 
   /**
    * 모든 알림 삭제
    */
   const clearAllNotifications = useCallback(() => {
     setNotifications([]);
-  }, []);
+  }, [setNotifications]);
 
   return {
     notifications,

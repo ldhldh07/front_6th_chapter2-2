@@ -8,16 +8,12 @@ import { useNotifications } from "./hooks/useNotifications";
 import { CartIcon } from "./components/icons";
 import { ToastContainer } from "./components/ui";
 
-export type NotificationType = "error" | "success" | "warning";
-
 const App = () => {
   const [isAdmin, setIsAdmin] = useAtom(isAdminAtom);
   const [searchTerm, setSearchTerm] = useAtom(searchTermAtom);
 
-  const { notifications, onSuccess, onError, removeNotification } =
-    useNotifications();
-
-  const { cart, cartItemCount } = useCart(onSuccess, onError);
+  const { notifications, removeNotification } = useNotifications();
+  const { cart, cartItemCount } = useCart();
 
   return (
     <>
@@ -69,11 +65,7 @@ const App = () => {
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {isAdmin ? (
-          <AdminPage onError={onError} onSuccess={onSuccess} />
-        ) : (
-          <CartPage onSuccess={onSuccess} onError={onError} />
-        )}
+        {isAdmin ? <AdminPage /> : <CartPage />}
       </main>
     </>
   );

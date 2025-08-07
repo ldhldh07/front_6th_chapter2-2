@@ -11,10 +11,7 @@ import {
   cartItemCountAtom,
 } from "../atoms/cartActions";
 
-export const useCart = (
-  onSuccess?: (message: string) => void,
-  onError?: (message: string) => void
-) => {
+export const useCart = () => {
   // Atom states
   const [cart, setCart] = useAtom(cartAtom);
   const [cartItemCount] = useAtom(cartItemCountAtom);
@@ -27,17 +24,9 @@ export const useCart = (
 
   const addToCart = useCallback(
     (product: Product) => {
-      if (onSuccess && onError) {
-        addToCartAction({ product, onSuccess, onError });
-      } else {
-        addToCartAction({
-          product,
-          onSuccess: () => {},
-          onError: () => {},
-        });
-      }
+      addToCartAction({ product });
     },
-    [addToCartAction, onSuccess, onError]
+    [addToCartAction]
   );
 
   const removeFromCart = useCallback(
@@ -49,27 +38,14 @@ export const useCart = (
 
   const updateQuantity = useCallback(
     (productId: string, newQuantity: number, products: Product[]) => {
-      if (onError) {
-        updateQuantityAction({ productId, newQuantity, products, onError });
-      } else {
-        updateQuantityAction({
-          productId,
-          newQuantity,
-          products,
-          onError: () => {},
-        });
-      }
+      updateQuantityAction({ productId, newQuantity, products });
     },
-    [updateQuantityAction, onError]
+    [updateQuantityAction]
   );
 
   const completeOrder = useCallback(() => {
-    if (onSuccess) {
-      completeOrderAction(onSuccess);
-    } else {
-      completeOrderAction(() => {});
-    }
-  }, [completeOrderAction, onSuccess]);
+    completeOrderAction();
+  }, [completeOrderAction]);
 
   const getStockForProduct = useCallback(
     (product: Product): number => {

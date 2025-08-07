@@ -2,13 +2,9 @@ import { TrashIcon, PlusIcon } from ".././icons";
 import { formatAdminPrice } from "../../utils/formatters";
 import { useCoupons } from "../../hooks/useCoupons";
 
-interface CouponListProps {
-  onSuccess: (message: string) => void;
-}
-
-export const CouponList = ({ onSuccess }: CouponListProps) => {
+export const CouponList = () => {
   const { coupons, showCouponForm, setShowCouponForm, deleteCoupon } =
-    useCoupons(onSuccess);
+    useCoupons();
 
   const handleAddCouponClick = () => {
     setShowCouponForm(!showCouponForm);

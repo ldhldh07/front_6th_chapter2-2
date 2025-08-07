@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 import { couponsAtom, selectedCouponAtom } from "./appAtoms";
 import { Coupon } from "../../types";
+import { addSuccessNotificationActionAtom } from "./notificationActions";
 
 /**
  * 쿠폰 추가 액션
@@ -10,18 +11,12 @@ export const addCouponActionAtom = atom(
   (
     get,
     set,
-    {
-      newCoupon,
-      onSuccess,
-    }: {
-      newCoupon: Omit<Coupon, "name"> & { name: string };
-      onSuccess: (message: string) => void;
-    }
+    { newCoupon }: { newCoupon: Omit<Coupon, "name"> & { name: string } }
   ) => {
     const coupons = get(couponsAtom);
     const updatedCoupons = [...coupons, newCoupon as Coupon];
     set(couponsAtom, updatedCoupons);
-    onSuccess("쿠폰이 추가되었습니다.");
+    set(addSuccessNotificationActionAtom, "쿠폰이 추가되었습니다.");
   }
 );
 
@@ -30,17 +25,7 @@ export const addCouponActionAtom = atom(
  */
 export const deleteCouponActionAtom = atom(
   null,
-  (
-    get,
-    set,
-    {
-      couponCode,
-      onSuccess,
-    }: {
-      couponCode: string;
-      onSuccess: (message: string) => void;
-    }
-  ) => {
+  (get, set, { couponCode }: { couponCode: string }) => {
     const coupons = get(couponsAtom);
     const updatedCoupons = coupons.filter(
       (coupon) => coupon.code !== couponCode
@@ -52,7 +37,7 @@ export const deleteCouponActionAtom = atom(
       set(selectedCouponAtom, null);
     }
 
-    onSuccess("쿠폰이 삭제되었습니다.");
+    set(addSuccessNotificationActionAtom, "쿠폰이 삭제되었습니다.");
   }
 );
 

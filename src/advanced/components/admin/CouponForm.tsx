@@ -2,14 +2,11 @@ import React from "react";
 import { processCouponForm, resetCouponForm } from "../../models/coupon";
 import { useValidate } from "../../utils/hooks/useValidate";
 import { useCoupons } from "../../hooks/useCoupons";
+import { useNotifications } from "../../hooks/useNotifications";
 
-interface CouponFormProps {
-  onError: (message: string) => void;
-  onSuccess: (message: string) => void;
-}
-
-export const CouponForm = ({ onError, onSuccess }: CouponFormProps) => {
+export const CouponForm = () => {
   const { validateDiscountValue, filterNumericInput } = useValidate();
+  const { onError } = useNotifications();
   const {
     coupons,
     couponForm,
@@ -17,7 +14,7 @@ export const CouponForm = ({ onError, onSuccess }: CouponFormProps) => {
     showCouponForm,
     setShowCouponForm,
     addCoupon,
-  } = useCoupons(onSuccess);
+  } = useCoupons();
 
   const handleCouponSubmit = (event: React.FormEvent) => {
     event.preventDefault();

@@ -8,27 +8,21 @@ import {
 } from "../models/product";
 import { addDiscountToList, removeDiscountFromList } from "../models/discount";
 import { productsAtom, productFormAtom, editingProductAtom } from "./appAtoms";
+import { addSuccessNotificationActionAtom } from "./notificationActions";
 
 /**
  * 새 상품 추가 액션
  */
 export const addProductActionAtom = atom(
   null,
-  (
-    get,
-    set,
-    {
-      newProduct,
-      onSuccess,
-    }: {
-      newProduct: Omit<ProductWithUI, "id">;
-      onSuccess: (message: string) => void;
-    }
-  ) => {
+  (get, set, { newProduct }: { newProduct: Omit<ProductWithUI, "id"> }) => {
     const prevProducts = get(productsAtom);
     const product = createProduct(newProduct, generateProductId(Date.now()));
     set(productsAtom, [...prevProducts, product]);
-    onSuccess(`상품 "${product.name}"이(가) 추가되었습니다.`);
+    set(
+      addSuccessNotificationActionAtom,
+      `상품 "${product.name}"이(가) 추가되었습니다.`
+    );
   }
 );
 
@@ -43,11 +37,9 @@ export const updateProductActionAtom = atom(
     {
       productId,
       updates,
-      onSuccess,
     }: {
       productId: string;
       updates: Partial<ProductWithUI>;
-      onSuccess: (message: string) => void;
     }
   ) => {
     const prevProducts = get(productsAtom);
@@ -55,7 +47,7 @@ export const updateProductActionAtom = atom(
       product.id === productId ? { ...product, ...updates } : product
     );
     set(productsAtom, updatedProducts);
-    onSuccess("상품이 수정되었습니다.");
+    set(addSuccessNotificationActionAtom, "상품이 수정되었습니다.");
   }
 );
 
@@ -70,6 +62,7 @@ export const deleteProductActionAtom = atom(
       (product) => product.id !== productId
     );
     set(productsAtom, filteredProducts);
+    set(addSuccessNotificationActionAtom, "상품이 삭제되었습니다.");
   }
 );
 

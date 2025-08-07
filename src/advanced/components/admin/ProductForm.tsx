@@ -4,15 +4,14 @@ import { useValidate } from "../../utils/hooks/useValidate";
 import { safeParseInt } from "../../utils/validators";
 import { useProducts } from "../../hooks/useProducts";
 import { createEmptyProductForm } from "../../models/product";
+import { useNotifications } from "../../hooks/useNotifications";
 
 interface ProductFormProps {
   showProductForm: boolean;
-  onError: (message: string) => void;
   setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const ProductForm = ({
-  onError,
   showProductForm,
   setShowProductForm,
 }: ProductFormProps) => {
@@ -29,6 +28,7 @@ export const ProductForm = ({
     setEditingProduct,
   } = useProducts();
   const { validatePrice, validateStock, filterNumericInput } = useValidate();
+  const { onError } = useNotifications();
 
   if (!showProductForm) {
     return null;

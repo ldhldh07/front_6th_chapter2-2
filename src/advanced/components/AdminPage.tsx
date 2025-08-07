@@ -5,13 +5,8 @@ import { ProductTable } from "./admin/ProductTable";
 import { CouponList } from "./admin/CouponList";
 import { useProducts } from "../hooks/useProducts";
 
-interface AdminPageProps {
-  onError: (message: string) => void;
-  onSuccess: (message: string) => void;
-}
-
-export const AdminPage = ({ onError, onSuccess }: AdminPageProps) => {
-  const { setEditingProduct } = useProducts(onSuccess);
+export const AdminPage = () => {
+  const { setEditingProduct } = useProducts();
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
   );
@@ -68,14 +63,10 @@ export const AdminPage = ({ onError, onSuccess }: AdminPageProps) => {
               </div>
             </div>
 
-            <ProductTable
-              onSuccess={onSuccess}
-              setShowProductForm={setShowProductForm}
-            />
+            <ProductTable setShowProductForm={setShowProductForm} />
             <ProductForm
               showProductForm={showProductForm}
               setShowProductForm={setShowProductForm}
-              onError={onError}
             />
           </section>
         ) : (
@@ -84,8 +75,8 @@ export const AdminPage = ({ onError, onSuccess }: AdminPageProps) => {
               <h2 className="text-lg font-semibold">쿠폰 관리</h2>
             </div>
             <div className="p-6">
-              <CouponList onSuccess={onSuccess} />
-              <CouponForm onSuccess={onSuccess} onError={onError} />
+              <CouponList />
+              <CouponForm />
             </div>
           </section>
         )}

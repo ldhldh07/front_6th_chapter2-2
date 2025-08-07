@@ -14,7 +14,7 @@ import {
 import { Coupon } from "../../types";
 import { CouponFormData, createEmptyCouponForm } from "../models/coupon";
 
-export const useCoupons = (onSuccess?: (message: string) => void) => {
+export const useCoupons = () => {
   const [coupons, setCoupons] = useAtom(couponsAtom);
   const [selectedCoupon, setSelectedCoupon] = useAtom(selectedCouponAtom);
   const [showCouponForm, setShowCouponForm] = useAtom(showCouponFormAtom);
@@ -30,24 +30,16 @@ export const useCoupons = (onSuccess?: (message: string) => void) => {
 
   const addCoupon = useCallback(
     (newCoupon: Omit<Coupon, "name"> & { name: string }) => {
-      if (onSuccess) {
-        addCouponAction({ newCoupon, onSuccess });
-      } else {
-        addCouponAction({ newCoupon, onSuccess: () => {} });
-      }
+      addCouponAction({ newCoupon });
     },
-    [addCouponAction, onSuccess]
+    [addCouponAction]
   );
 
   const deleteCoupon = useCallback(
     (couponCode: string) => {
-      if (onSuccess) {
-        deleteCouponAction({ couponCode, onSuccess });
-      } else {
-        deleteCouponAction({ couponCode, onSuccess: () => {} });
-      }
+      deleteCouponAction({ couponCode });
     },
-    [deleteCouponAction, onSuccess]
+    [deleteCouponAction]
   );
 
   const applyCoupon = useCallback(

@@ -8,6 +8,14 @@ import {
 import { initialProducts, initialCoupons } from "../constants";
 import { CartItem, Coupon } from "../../types";
 
+export type NotificationType = "error" | "success" | "warning";
+
+export interface Notification {
+  id: string;
+  message: string;
+  type: NotificationType;
+}
+
 /**
  * 관리자 모드 상태
  * 전역에서 관리자/사용자 페이지 전환에 사용
@@ -20,10 +28,9 @@ export const isAdminAtom = atom(false);
 export const searchTermAtom = atom("");
 
 /**
- * 디바운스된 값을 위한 제네릭 atom 팩토리
+ * 디바운스된 검색어 상태
  */
-export const createDebouncedAtom = <T>(initialValue: T) =>
-  atom<T>(initialValue);
+export const debouncedSearchTermAtom = atom<string>("");
 
 /**
  * 상품 목록 상태
@@ -62,3 +69,8 @@ export const selectedCouponAtom = atom<Coupon | null>(null);
  * 쿠폰 폼 표시 상태
  */
 export const showCouponFormAtom = atom<boolean>(false);
+
+/**
+ * 알림 목록 상태
+ */
+export const notificationsAtom = atom<Notification[]>([]);
