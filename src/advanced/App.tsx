@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useAtom } from "jotai";
 import { Coupon } from "../types";
+import { isAdminAtom } from "./atoms/appAtoms";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
 import { initialProducts, initialCoupons } from "./constants";
@@ -16,7 +18,7 @@ import { ToastContainer } from "./components/ui";
 export type NotificationType = "error" | "success" | "warning";
 
 const App = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useAtom(isAdminAtom);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
