@@ -15,8 +15,6 @@ interface ProductFormProps {
   productForm: ProductFormData;
   setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
   handleProductSubmit: (e: React.FormEvent) => void;
-  setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>;
-  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
   addNotification: (message: string, type?: NotificationType) => void;
   handleCancelClick: () => void;
   handleDiscountAdd: () => void;

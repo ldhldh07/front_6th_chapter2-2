@@ -30,7 +30,6 @@ export const useProducts = (
   );
 
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
-  const [showProductForm, setShowProductForm] = useState(false);
 
   // ============================================================================
   // 상품 CRUD 작업
@@ -82,43 +81,11 @@ export const useProducts = (
   // ============================================================================
 
   /**
-   * 상품 폼 제출 처리
-   */
-  const handleProductSubmit = useCallback(
-    (event: React.FormEvent) => {
-      event.preventDefault();
-
-      if (editingProduct === "new") {
-        addProduct(productForm);
-      }
-
-      if (editingProduct && editingProduct !== "new") {
-        updateProduct(editingProduct, productForm);
-      }
-
-      setEditingProduct(null);
-      setProductForm(createEmptyProductForm());
-      setShowProductForm(false);
-    },
-    [editingProduct, productForm, addProduct, updateProduct]
-  );
-
-  /**
    * 상품 편집 시작
    */
   const startEditProduct = useCallback((product: ProductWithUI) => {
     setEditingProduct(product.id);
     setProductForm(createProductFormFromProduct(product));
-    setShowProductForm(true);
-  }, []);
-
-  /**
-   * 폼 취소 처리
-   */
-  const handleCancelClick = useCallback(() => {
-    setEditingProduct(null);
-    setProductForm(createEmptyProductForm());
-    setShowProductForm(false);
   }, []);
 
   // ============================================================================
@@ -199,14 +166,10 @@ export const useProducts = (
     setProductForm,
     editingProduct,
     setEditingProduct,
-    showProductForm,
-    setShowProductForm,
     addProduct,
     updateProduct,
     deleteProduct,
-    handleProductSubmit,
     startEditProduct,
-    handleCancelClick,
     handleDiscountAdd,
     handleDiscountRemove,
     handleDiscountQuantityChange,

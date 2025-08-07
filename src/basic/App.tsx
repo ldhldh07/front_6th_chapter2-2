@@ -62,14 +62,10 @@ const App = () => {
     setProductForm,
     editingProduct,
     setEditingProduct,
-    showProductForm,
-    setShowProductForm,
     addProduct,
     updateProduct,
     deleteProduct,
-    handleProductSubmit,
     startEditProduct,
-    handleCancelClick,
     handleDiscountAdd,
     handleDiscountRemove,
     handleDiscountQuantityChange,
@@ -142,14 +138,10 @@ const App = () => {
             setProductForm={setProductForm}
             editingProduct={editingProduct}
             setEditingProduct={setEditingProduct}
-            showProductForm={showProductForm}
-            setShowProductForm={setShowProductForm}
             addProduct={addProduct}
             updateProduct={updateProduct}
             deleteProduct={deleteProduct}
-            handleProductSubmit={handleProductSubmit}
             startEditProduct={startEditProduct}
-            handleCancelClick={handleCancelClick}
             handleDiscountAdd={handleDiscountAdd}
             handleDiscountRemove={handleDiscountRemove}
             handleDiscountQuantityChange={handleDiscountQuantityChange}

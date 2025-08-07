@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Coupon } from "../../types";
 import { NotificationType } from "../App";
 import { CouponForm } from "./admin/CouponForm";
-import { ProductWithUI, ProductFormData } from "../models/product";
+import {
+  ProductWithUI,
+  ProductFormData,
+  createEmptyProductForm,
+} from "../models/product";
 import { CouponFormData } from "../models/coupon";
 import { ProductForm } from "./admin/ProductForm";
 import { ProductTable } from "./admin/ProductTable";
@@ -23,14 +27,10 @@ interface AdminPageProps {
   setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
   editingProduct: string | null;
   setEditingProduct: React.Dispatch<React.SetStateAction<string | null>>;
-  showProductForm: boolean;
-  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
   addProduct: (newProduct: Omit<ProductWithUI, "id">) => void;
   updateProduct: (productId: string, updates: Partial<ProductWithUI>) => void;
   deleteProduct: (productId: string) => void;
-  handleProductSubmit: (e: React.FormEvent) => void;
   startEditProduct: (product: ProductWithUI) => void;
-  handleCancelClick: () => void;
   handleDiscountAdd: () => void;
   handleDiscountRemove: (index: number) => void;
   handleDiscountQuantityChange: (index: number, quantity: number) => void;
@@ -52,12 +52,10 @@ export const AdminPage = ({
   setProductForm,
   editingProduct,
   setEditingProduct,
-  showProductForm,
-  setShowProductForm,
+  addProduct,
+  updateProduct,
   deleteProduct,
-  handleProductSubmit,
   startEditProduct,
-  handleCancelClick,
   handleDiscountAdd,
   handleDiscountRemove,
   handleDiscountQuantityChange,
@@ -66,6 +64,39 @@ export const AdminPage = ({
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
   );
+  const [showProductForm, setShowProductForm] = useState(false);
+
+  const handleOpenProductForm = () => {
+    setEditingProduct("new");
+    setShowProductForm(true);
+  };
+
+  const handleStartEditProduct = (product: ProductWithUI) => {
+    startEditProduct(product);
+    setShowProductForm(true);
+  };
+
+  const handleCancelForm = () => {
+    setEditingProduct(null);
+    setProductForm(createEmptyProductForm());
+    setShowProductForm(false);
+  };
+
+  const handleSubmitForm = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (editingProduct === "new") {
+      addProduct(productForm);
+    }
+
+    if (editingProduct && editingProduct !== "new") {
+      updateProduct(editingProduct, productForm);
+    }
+
+    setEditingProduct(null);
+    setProductForm(createEmptyProductForm());
+    setShowProductForm(false);
+  };
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
@@ -105,10 +136,7 @@ export const AdminPage = ({
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">상품 목록</h2>
                 <button
-                  onClick={() => {
-                    setEditingProduct("new");
-                    setShowProductForm(true);
-                  }}
+                  onClick={handleOpenProductForm}
                   className="px-4 py-2 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-800"
                 >
                   새 상품 추가
@@ -118,7 +146,7 @@ export const AdminPage = ({
 
             <ProductTable
               products={products}
-              startEditProduct={startEditProduct}
+              startEditProduct={handleStartEditProduct}
               deleteProduct={deleteProduct}
             />
             <ProductForm
@@ -126,11 +154,9 @@ export const AdminPage = ({
               editingProduct={editingProduct}
               productForm={productForm}
               setProductForm={setProductForm}
-              handleProductSubmit={handleProductSubmit}
-              setEditingProduct={setEditingProduct}
-              setShowProductForm={setShowProductForm}
+              handleProductSubmit={handleSubmitForm}
               addNotification={addNotification}
-              handleCancelClick={handleCancelClick}
+              handleCancelClick={handleCancelForm}
               handleDiscountAdd={handleDiscountAdd}
               handleDiscountRemove={handleDiscountRemove}
               handleDiscountQuantityChange={handleDiscountQuantityChange}
