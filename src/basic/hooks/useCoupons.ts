@@ -8,6 +8,7 @@ import {
   addCouponToList,
 } from "../models/coupon";
 import { calculateCartTotal } from "../models/cart";
+import { SUCCESS_MESSAGES } from "../constants/messages";
 
 interface UseCouponsProps {
   coupons: Coupon[];
@@ -37,7 +38,7 @@ export const useCoupons = ({
   const addCoupon = useCallback(
     (newCoupon: Coupon) => {
       onUpdateCoupons(addCouponToList(coupons, newCoupon));
-      onSuccess("쿠폰이 추가되었습니다.");
+      onSuccess(SUCCESS_MESSAGES.COUPON_ADDED);
     },
     [coupons, onUpdateCoupons, onSuccess]
   );
@@ -45,7 +46,7 @@ export const useCoupons = ({
   const deleteCoupon = useCallback(
     (couponCode: string) => {
       onUpdateCoupons(removeCouponFromList(coupons, couponCode));
-      onSuccess("쿠폰이 삭제되었습니다.");
+      onSuccess(SUCCESS_MESSAGES.COUPON_DELETED);
     },
     [coupons, onUpdateCoupons, onSuccess]
   );
@@ -65,7 +66,7 @@ export const useCoupons = ({
       }
 
       setSelectedCoupon(coupon);
-      onSuccess("쿠폰이 적용되었습니다.");
+      onSuccess(SUCCESS_MESSAGES.COUPON_APPLIED);
     },
     [cart, selectedCoupon, onSuccess, onError]
   );

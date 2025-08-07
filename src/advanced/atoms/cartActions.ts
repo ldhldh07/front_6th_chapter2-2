@@ -17,6 +17,7 @@ import {
   addSuccessNotificationActionAtom,
   addErrorNotificationActionAtom,
 } from "./notificationActions";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages";
 
 export const addToCartActionAtom = atom(
   null,
@@ -25,7 +26,7 @@ export const addToCartActionAtom = atom(
     const remainingStock = getRemainingStock(product, cart);
 
     if (remainingStock <= 0) {
-      set(addErrorNotificationActionAtom, "재고가 부족합니다!");
+      set(addErrorNotificationActionAtom, ERROR_MESSAGES.STOCK_INSUFFICIENT);
       return;
     }
 
@@ -35,13 +36,13 @@ export const addToCartActionAtom = atom(
     if (addedItem && isStockExceeded(addedItem.quantity, product.stock)) {
       set(
         addErrorNotificationActionAtom,
-        `재고는 ${product.stock}개까지만 있습니다.`
+        ERROR_MESSAGES.STOCK_EXCEEDED(product.stock)
       );
       return;
     }
 
     set(cartAtom, newCart);
-    set(addSuccessNotificationActionAtom, "장바구니에 담았습니다");
+    set(addSuccessNotificationActionAtom, SUCCESS_MESSAGES.ITEM_ADDED_TO_CART);
   }
 );
 
@@ -81,7 +82,7 @@ export const updateQuantityActionAtom = atom(
     if (isStockExceeded(newQuantity, product.stock)) {
       set(
         addErrorNotificationActionAtom,
-        `재고는 ${product.stock}개까지만 있습니다.`
+        ERROR_MESSAGES.STOCK_EXCEEDED(product.stock)
       );
       return;
     }
@@ -94,7 +95,7 @@ export const completeOrderActionAtom = atom(null, (_get, set) => {
   const orderNumber = generateOrderNumber(Date.now());
   set(
     addSuccessNotificationActionAtom,
-    `주문이 완료되었습니다. 주문번호: ${orderNumber}`
+    SUCCESS_MESSAGES.ORDER_COMPLETED(orderNumber)
   );
   set(cartAtom, []);
 });

@@ -14,6 +14,7 @@ import {
 } from "../models/discount";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { percentToDecimal } from "../utils/formatters";
+import { SUCCESS_MESSAGES } from "../constants/messages";
 
 export const useProducts = (
   initialProducts: ProductWithUI[],
@@ -55,7 +56,7 @@ export const useProducts = (
           product.id === productId ? { ...product, ...updates } : product
         )
       );
-      onSuccess("상품이 수정되었습니다.");
+      onSuccess(SUCCESS_MESSAGES.PRODUCT_UPDATED);
     },
     [setProducts, onSuccess]
   );
@@ -66,7 +67,7 @@ export const useProducts = (
   const deleteProduct = useCallback(
     (productId: string) => {
       setProducts((prev) => prev.filter((product) => product.id !== productId));
-      onSuccess("상품이 삭제되었습니다.");
+      onSuccess(SUCCESS_MESSAGES.PRODUCT_DELETED);
     },
     [setProducts, onSuccess]
   );

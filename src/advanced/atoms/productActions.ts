@@ -9,6 +9,7 @@ import {
 import { addDiscountToList, removeDiscountFromList } from "../models/discount";
 import { productsAtom, productFormAtom, editingProductAtom } from "./appAtoms";
 import { addSuccessNotificationActionAtom } from "./notificationActions";
+import { SUCCESS_MESSAGES } from "../constants/messages";
 
 /**
  * 새 상품 추가 액션
@@ -19,10 +20,7 @@ export const addProductActionAtom = atom(
     const prevProducts = get(productsAtom);
     const product = createProduct(newProduct, generateProductId(Date.now()));
     set(productsAtom, [...prevProducts, product]);
-    set(
-      addSuccessNotificationActionAtom,
-      `상품 "${product.name}"이(가) 추가되었습니다.`
-    );
+    set(addSuccessNotificationActionAtom, SUCCESS_MESSAGES.PRODUCT_ADDED);
   }
 );
 
@@ -47,7 +45,7 @@ export const updateProductActionAtom = atom(
       product.id === productId ? { ...product, ...updates } : product
     );
     set(productsAtom, updatedProducts);
-    set(addSuccessNotificationActionAtom, "상품이 수정되었습니다.");
+    set(addSuccessNotificationActionAtom, SUCCESS_MESSAGES.PRODUCT_UPDATED);
   }
 );
 
@@ -62,7 +60,7 @@ export const deleteProductActionAtom = atom(
       (product) => product.id !== productId
     );
     set(productsAtom, filteredProducts);
-    set(addSuccessNotificationActionAtom, "상품이 삭제되었습니다.");
+    set(addSuccessNotificationActionAtom, SUCCESS_MESSAGES.PRODUCT_DELETED);
   }
 );
 

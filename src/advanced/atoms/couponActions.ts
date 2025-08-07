@@ -2,6 +2,7 @@ import { atom } from "jotai";
 import { couponsAtom, selectedCouponAtom } from "./appAtoms";
 import { Coupon } from "../../types";
 import { addSuccessNotificationActionAtom } from "./notificationActions";
+import { SUCCESS_MESSAGES } from "../constants/messages";
 
 /**
  * 쿠폰 추가 액션
@@ -16,7 +17,7 @@ export const addCouponActionAtom = atom(
     const coupons = get(couponsAtom);
     const updatedCoupons = [...coupons, newCoupon as Coupon];
     set(couponsAtom, updatedCoupons);
-    set(addSuccessNotificationActionAtom, "쿠폰이 추가되었습니다.");
+    set(addSuccessNotificationActionAtom, SUCCESS_MESSAGES.COUPON_ADDED);
   }
 );
 
@@ -37,7 +38,7 @@ export const deleteCouponActionAtom = atom(
       set(selectedCouponAtom, null);
     }
 
-    set(addSuccessNotificationActionAtom, "쿠폰이 삭제되었습니다.");
+    set(addSuccessNotificationActionAtom, SUCCESS_MESSAGES.COUPON_DELETED);
   }
 );
 

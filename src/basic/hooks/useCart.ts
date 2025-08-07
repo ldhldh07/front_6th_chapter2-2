@@ -13,6 +13,7 @@ import {
 } from "../models/cart";
 import { findProductById } from "../models/product";
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages";
 
 export const useCart = () => {
   const [cart, setCart] = useLocalStorage<CartItem[]>("cart", []);
@@ -31,7 +32,7 @@ export const useCart = () => {
     ) => {
       const remainingStock = getRemainingStock(product, cart);
       if (remainingStock <= 0) {
-        onError("재고가 부족합니다!");
+        onError(ERROR_MESSAGES.STOCK_INSUFFICIENT);
         return;
       }
 
@@ -39,12 +40,12 @@ export const useCart = () => {
       const addedItem = findCartItemByProductId(newCart, product.id);
 
       if (addedItem && isStockExceeded(addedItem.quantity, product.stock)) {
-        onError(`재고는 ${product.stock}개까지만 있습니다.`);
+        onError(ERROR_MESSAGES.STOCK_EXCEEDED(product.stock));
         return;
       }
 
       setCart(newCart);
-      onSuccess("장바구니에 담았습니다");
+      onSuccess(SUCCESS_MESSAGES.ITEM_ADDED_TO_CART);
     },
     [cart]
   );
@@ -72,7 +73,7 @@ export const useCart = () => {
       if (!product) return;
 
       if (isStockExceeded(newQuantity, product.stock)) {
-        onError(`재고는 ${product.stock}개까지만 있습니다.`);
+        onError(ERROR_MESSAGES.STOCK_EXCEEDED(product.stock));
         return;
       }
 
@@ -83,7 +84,7 @@ export const useCart = () => {
 
   const completeOrder = useCallback((onSuccess: (message: string) => void) => {
     const orderNumber = generateOrderNumber(Date.now());
-    onSuccess(`주문이 완료되었습니다. 주문번호: ${orderNumber}`);
+    onSuccess(SUCCESS_MESSAGES.ORDER_COMPLETED(orderNumber));
     setCart([]);
   }, []);
 
