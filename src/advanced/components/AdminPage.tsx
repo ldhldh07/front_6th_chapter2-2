@@ -1,48 +1,17 @@
 import { useState } from "react";
-import { Coupon } from "../../types";
 import { CouponForm } from "./admin/CouponForm";
-import { ProductWithUI, createEmptyProductForm } from "../models/product";
-import { CouponFormData } from "../models/coupon";
 import { ProductForm } from "./admin/ProductForm";
 import { ProductTable } from "./admin/ProductTable";
 import { CouponList } from "./admin/CouponList";
 import { useProducts } from "../hooks/useProducts";
 
 interface AdminPageProps {
-  coupons: Coupon[];
-  couponForm: CouponFormData;
-  setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
-  showCouponForm: boolean;
-  setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
-  addCoupon: (newCoupon: Coupon) => void;
-  deleteCoupon: (couponCode: string) => void;
   onError: (message: string) => void;
   onSuccess: (message: string) => void;
-  emptyCouponForm: CouponFormData;
 }
 
-export const AdminPage = ({
-  coupons,
-  couponForm,
-  setCouponForm,
-  showCouponForm,
-  setShowCouponForm,
-  addCoupon,
-  deleteCoupon,
-  onError,
-  onSuccess,
-  emptyCouponForm,
-}: AdminPageProps) => {
-  const {
-    productForm,
-    setProductForm,
-    editingProduct,
-    setEditingProduct,
-    addProduct,
-    updateProduct,
-    startEditProductAction,
-  } = useProducts(onSuccess);
-
+export const AdminPage = ({ onError, onSuccess }: AdminPageProps) => {
+  const { setEditingProduct } = useProducts(onSuccess);
   const [activeTab, setActiveTab] = useState<"products" | "coupons">(
     "products"
   );
@@ -51,31 +20,6 @@ export const AdminPage = ({
   const handleOpenProductForm = () => {
     setEditingProduct("new");
     setShowProductForm(true);
-  };
-
-  const handleStartEditProduct = (product: ProductWithUI) => {
-    startEditProductAction(product);
-    setShowProductForm(true);
-  };
-
-  const handleCancelForm = () => {
-    setEditingProduct(null);
-    setProductForm(createEmptyProductForm());
-    setShowProductForm(false);
-  };
-
-  const handleSubmitForm = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (editingProduct === "new") {
-      addProduct(productForm);
-    }
-
-    if (editingProduct && editingProduct !== "new") {
-      updateProduct(editingProduct, productForm);
-    }
-
-    setShowProductForm(false);
   };
 
   return (
@@ -125,14 +69,13 @@ export const AdminPage = ({
             </div>
 
             <ProductTable
-              startEditProduct={handleStartEditProduct}
               onSuccess={onSuccess}
+              setShowProductForm={setShowProductForm}
             />
             <ProductForm
               showProductForm={showProductForm}
-              handleProductSubmit={handleSubmitForm}
+              setShowProductForm={setShowProductForm}
               onError={onError}
-              handleCancelClick={handleCancelForm}
             />
           </section>
         ) : (
@@ -141,23 +84,8 @@ export const AdminPage = ({
               <h2 className="text-lg font-semibold">쿠폰 관리</h2>
             </div>
             <div className="p-6">
-              <CouponList
-                coupons={coupons}
-                deleteCoupon={deleteCoupon}
-                setShowCouponForm={setShowCouponForm}
-                showCouponForm={showCouponForm}
-              />
-
-              <CouponForm
-                showCouponForm={showCouponForm}
-                couponForm={couponForm}
-                setCouponForm={setCouponForm}
-                setShowCouponForm={setShowCouponForm}
-                addCoupon={addCoupon}
-                onError={onError}
-                emptyCouponForm={emptyCouponForm}
-                coupons={coupons}
-              />
+              <CouponList onSuccess={onSuccess} />
+              <CouponForm onSuccess={onSuccess} onError={onError} />
             </div>
           </section>
         )}

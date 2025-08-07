@@ -1,21 +1,21 @@
-import { Product } from "../../../types";
 import { formatPriceForUser } from "../../models/product";
 import { ImageIcon } from "../icons";
 import { getStockStatus } from "../../utils/validators";
 import { useCart } from "../../hooks/useCart";
 import { useProducts } from "../../hooks/useProducts";
+import { useDebounce } from "../../utils/hooks/useDebounce";
+import { useAtom } from "jotai";
+import { searchTermAtom } from "../../atoms/appAtoms";
 
 interface ProductListProps {
-  debouncedSearchTerm: string;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
 
-export const ProductList = ({
-  debouncedSearchTerm,
-  onSuccess,
-  onError,
-}: ProductListProps) => {
+export const ProductList = ({ onSuccess, onError }: ProductListProps) => {
+  const [searchTerm] = useAtom(searchTermAtom);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   const { products } = useProducts();
   const { addToCart, getStockForProduct } = useCart(onSuccess, onError);
 

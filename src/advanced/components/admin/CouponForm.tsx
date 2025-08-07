@@ -1,33 +1,23 @@
 import React from "react";
-import { Coupon } from "../../../types";
-import {
-  CouponFormData,
-  processCouponForm,
-  resetCouponForm,
-} from "../../models/coupon";
+import { processCouponForm, resetCouponForm } from "../../models/coupon";
 import { useValidate } from "../../utils/hooks/useValidate";
+import { useCoupons } from "../../hooks/useCoupons";
 
 interface CouponFormProps {
-  showCouponForm: boolean;
-  couponForm: CouponFormData;
-  setCouponForm: React.Dispatch<React.SetStateAction<CouponFormData>>;
-  setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
-  addCoupon: (newCoupon: Coupon) => void;
   onError: (message: string) => void;
-  emptyCouponForm: CouponFormData;
-  coupons: Coupon[];
+  onSuccess: (message: string) => void;
 }
 
-export const CouponForm = ({
-  showCouponForm,
-  couponForm,
-  setCouponForm,
-  setShowCouponForm,
-  addCoupon,
-  onError,
-  coupons,
-}: CouponFormProps) => {
+export const CouponForm = ({ onError, onSuccess }: CouponFormProps) => {
   const { validateDiscountValue, filterNumericInput } = useValidate();
+  const {
+    coupons,
+    couponForm,
+    setCouponForm,
+    showCouponForm,
+    setShowCouponForm,
+    addCoupon,
+  } = useCoupons(onSuccess);
 
   const handleCouponSubmit = (event: React.FormEvent) => {
     event.preventDefault();

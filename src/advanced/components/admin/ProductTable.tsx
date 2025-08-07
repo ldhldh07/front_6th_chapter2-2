@@ -3,15 +3,20 @@ import { getStockStatus } from "../../utils/validators";
 import { useProducts } from "../../hooks/useProducts";
 
 interface ProductTableProps {
-  startEditProduct: (product: ProductWithUI) => void;
   onSuccess: (message: string) => void;
+  setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const ProductTable = ({
-  startEditProduct,
   onSuccess,
+  setShowProductForm,
 }: ProductTableProps) => {
   const { products, deleteProduct } = useProducts(onSuccess);
+  const { startEditProductAction } = useProducts(onSuccess);
+  const handleStartEditProduct = (product: ProductWithUI) => {
+    startEditProductAction(product);
+    setShowProductForm(true);
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -62,7 +67,7 @@ export const ProductTable = ({
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
-                  onClick={() => startEditProduct(product)}
+                  onClick={() => handleStartEditProduct(product)}
                   className="text-indigo-600 hover:text-indigo-900 mr-3"
                 >
                   수정

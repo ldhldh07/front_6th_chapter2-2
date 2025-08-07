@@ -1,27 +1,16 @@
-import { Coupon } from "../../../types";
 import { CloseIcon, ShoppingBagIcon } from "../icons";
 import { formatKoreanWon } from "../../utils/formatters";
 import { calculateItemTotal } from "../../models/cart";
 import { useCart } from "../../hooks/useCart";
 import { useProducts } from "../../hooks/useProducts";
+import { useCoupons } from "../../hooks/useCoupons";
 
 interface CartProps {
-  coupons: Coupon[];
-  selectedCoupon: Coupon | null;
-  setSelectedCoupon: (coupon: Coupon | null) => void;
-  applyCoupon: (coupon: Coupon) => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
 }
 
-const Cart = ({
-  coupons,
-  selectedCoupon,
-  setSelectedCoupon,
-  applyCoupon,
-  onSuccess,
-  onError,
-}: CartProps) => {
+const Cart = ({ onSuccess, onError }: CartProps) => {
   const {
     cart,
     removeFromCart,
@@ -29,8 +18,9 @@ const Cart = ({
     completeOrder,
     calculateTotal,
   } = useCart(onSuccess, onError);
-
   const { products } = useProducts();
+  const { coupons, selectedCoupon, setSelectedCoupon, applyCoupon } =
+    useCoupons(onSuccess);
 
   const handleCouponSelectOnChange = (
     event: React.ChangeEvent<HTMLSelectElement>

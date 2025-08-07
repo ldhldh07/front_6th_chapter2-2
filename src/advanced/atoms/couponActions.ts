@@ -1,0 +1,71 @@
+import { atom } from "jotai";
+import { couponsAtom, selectedCouponAtom } from "./appAtoms";
+import { Coupon } from "../../types";
+
+/**
+ * 쿠폰 추가 액션
+ */
+export const addCouponActionAtom = atom(
+  null,
+  (
+    get,
+    set,
+    {
+      newCoupon,
+      onSuccess,
+    }: {
+      newCoupon: Omit<Coupon, "name"> & { name: string };
+      onSuccess: (message: string) => void;
+    }
+  ) => {
+    const coupons = get(couponsAtom);
+    const updatedCoupons = [...coupons, newCoupon as Coupon];
+    set(couponsAtom, updatedCoupons);
+    onSuccess("쿠폰이 추가되었습니다.");
+  }
+);
+
+/**
+ * 쿠폰 삭제 액션
+ */
+export const deleteCouponActionAtom = atom(
+  null,
+  (
+    get,
+    set,
+    {
+      couponCode,
+      onSuccess,
+    }: {
+      couponCode: string;
+      onSuccess: (message: string) => void;
+    }
+  ) => {
+    const coupons = get(couponsAtom);
+    const updatedCoupons = coupons.filter(
+      (coupon) => coupon.code !== couponCode
+    );
+    set(couponsAtom, updatedCoupons);
+
+    const selectedCoupon = get(selectedCouponAtom);
+    if (selectedCoupon?.code === couponCode) {
+      set(selectedCouponAtom, null);
+    }
+
+    onSuccess("쿠폰이 삭제되었습니다.");
+  }
+);
+
+/**
+ * 쿠폰 적용 액션
+ */
+export const applyCouponActionAtom = atom(null, (_get, set, coupon: Coupon) => {
+  set(selectedCouponAtom, coupon);
+});
+
+/**
+ * 쿠폰 선택 해제 액션
+ */
+export const clearSelectedCouponActionAtom = atom(null, (_get, set) => {
+  set(selectedCouponAtom, null);
+});

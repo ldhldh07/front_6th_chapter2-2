@@ -1,21 +1,15 @@
-import React from "react";
-import { Coupon } from "../../../types";
 import { TrashIcon, PlusIcon } from ".././icons";
 import { formatAdminPrice } from "../../utils/formatters";
+import { useCoupons } from "../../hooks/useCoupons";
 
 interface CouponListProps {
-  coupons: Coupon[];
-  deleteCoupon: (couponCode: string) => void;
-  setShowCouponForm: React.Dispatch<React.SetStateAction<boolean>>;
-  showCouponForm: boolean;
+  onSuccess: (message: string) => void;
 }
 
-export const CouponList = ({
-  coupons,
-  deleteCoupon,
-  setShowCouponForm,
-  showCouponForm,
-}: CouponListProps) => {
+export const CouponList = ({ onSuccess }: CouponListProps) => {
+  const { coupons, showCouponForm, setShowCouponForm, deleteCoupon } =
+    useCoupons(onSuccess);
+
   const handleAddCouponClick = () => {
     setShowCouponForm(!showCouponForm);
   };

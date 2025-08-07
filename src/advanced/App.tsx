@@ -1,14 +1,9 @@
 import { useAtom } from "jotai";
-import { Coupon } from "../types";
 import { isAdminAtom, searchTermAtom } from "./atoms/appAtoms";
 import { CartPage } from "./components/CartPage";
 import { AdminPage } from "./components/AdminPage";
-import { initialCoupons } from "./constants";
 import { useCart } from "./hooks/useCart";
-import { useCoupons } from "./hooks/useCoupons";
 import { useNotifications } from "./hooks/useNotifications";
-import { createEmptyCouponForm } from "./models/coupon";
-import { useLocalStorage } from "./utils/hooks/useLocalStorage";
 
 import { CartIcon } from "./components/icons";
 import { ToastContainer } from "./components/ui";
@@ -23,29 +18,6 @@ const App = () => {
     useNotifications();
 
   const { cart, cartItemCount } = useCart(onSuccess, onError);
-
-  const [coupons, setCoupons] = useLocalStorage<Coupon[]>(
-    "coupons",
-    initialCoupons
-  );
-
-  const {
-    couponForm,
-    setCouponForm,
-    showCouponForm,
-    setShowCouponForm,
-    addCoupon,
-    deleteCoupon,
-    selectedCoupon,
-    setSelectedCoupon,
-    applyCoupon,
-  } = useCoupons({
-    coupons,
-    onUpdateCoupons: setCoupons,
-    onSuccess,
-    onError,
-    cart,
-  });
 
   return (
     <>
@@ -98,27 +70,9 @@ const App = () => {
       </header>
       <main className="max-w-7xl mx-auto px-4 py-8">
         {isAdmin ? (
-          <AdminPage
-            coupons={coupons}
-            couponForm={couponForm}
-            setCouponForm={setCouponForm}
-            showCouponForm={showCouponForm}
-            setShowCouponForm={setShowCouponForm}
-            addCoupon={addCoupon}
-            deleteCoupon={deleteCoupon}
-            onError={onError}
-            onSuccess={onSuccess}
-            emptyCouponForm={createEmptyCouponForm()}
-          />
+          <AdminPage onError={onError} onSuccess={onSuccess} />
         ) : (
-          <CartPage
-            coupons={coupons}
-            selectedCoupon={selectedCoupon}
-            setSelectedCoupon={setSelectedCoupon}
-            applyCoupon={applyCoupon}
-            onSuccess={onSuccess}
-            onError={onError}
-          />
+          <CartPage onSuccess={onSuccess} onError={onError} />
         )}
       </main>
     </>

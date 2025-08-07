@@ -5,8 +5,8 @@ import {
   ProductFormData,
   createEmptyProductForm,
 } from "../models/product";
-import { initialProducts } from "../constants";
-import { CartItem } from "../../types";
+import { initialProducts, initialCoupons } from "../constants";
+import { CartItem, Coupon } from "../../types";
 
 /**
  * 관리자 모드 상태
@@ -44,6 +44,21 @@ export const productFormAtom = atom<ProductFormData>(createEmptyProductForm());
 export const editingProductAtom = atom<string | null>(null);
 
 /**
- * 장바구니 상태 (localStorage 자동 연동)
+ * 장바구니 상태
  */
 export const cartAtom = atomWithStorage<CartItem[]>("cart", []);
+
+/**
+ * 쿠폰 상태
+ */
+export const couponsAtom = atomWithStorage<Coupon[]>("coupons", initialCoupons);
+
+/**
+ * 선택된 쿠폰 상태
+ */
+export const selectedCouponAtom = atom<Coupon | null>(null);
+
+/**
+ * 쿠폰 폼 표시 상태
+ */
+export const showCouponFormAtom = atom<boolean>(false);

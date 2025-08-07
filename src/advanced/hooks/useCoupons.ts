@@ -1,84 +1,85 @@
-import { useState, useCallback } from "react";
-import { Coupon, CartItem } from "../../types";
+import { useAtom, useSetAtom } from "jotai";
+import { useCallback, useState } from "react";
 import {
-  CouponFormData,
-  createEmptyCouponForm,
-  validateCouponApplication,
-  removeCouponFromList,
-  addCouponToList,
-} from "../models/coupon";
-import { calculateCartTotal } from "../models/cart";
+  couponsAtom,
+  selectedCouponAtom,
+  showCouponFormAtom,
+} from "../atoms/appAtoms";
+import {
+  addCouponActionAtom,
+  deleteCouponActionAtom,
+  applyCouponActionAtom,
+  clearSelectedCouponActionAtom,
+} from "../atoms/couponActions";
+import { Coupon } from "../../types";
+import { CouponFormData, createEmptyCouponForm } from "../models/coupon";
 
-interface UseCouponsProps {
-  coupons: Coupon[];
-  onUpdateCoupons: (coupons: Coupon[]) => void;
-  onSuccess: (message: string) => void;
-  onError: (message: string) => void;
-  cart?: CartItem[];
-}
+export const useCoupons = (onSuccess?: (message: string) => void) => {
+  const [coupons, setCoupons] = useAtom(couponsAtom);
+  const [selectedCoupon, setSelectedCoupon] = useAtom(selectedCouponAtom);
+  const [showCouponForm, setShowCouponForm] = useAtom(showCouponFormAtom);
 
-/**
- * 쿠폰 관리를 위한 커스텀 Hook
- * 쿠폰 폼 상태, 쿠폰 추가/삭제 로직을 관리합니다.
- */
-export const useCoupons = ({
-  coupons,
-  onUpdateCoupons,
-  onSuccess,
-  onError,
-  cart = [],
-}: UseCouponsProps) => {
   const [couponForm, setCouponForm] = useState<CouponFormData>(
     createEmptyCouponForm()
   );
-  const [showCouponForm, setShowCouponForm] = useState(false);
-  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+
+  const addCouponAction = useSetAtom(addCouponActionAtom);
+  const deleteCouponAction = useSetAtom(deleteCouponActionAtom);
+  const applyCouponAction = useSetAtom(applyCouponActionAtom);
+  const clearSelectedCouponAction = useSetAtom(clearSelectedCouponActionAtom);
 
   const addCoupon = useCallback(
-    (newCoupon: Coupon) => {
-      onUpdateCoupons(addCouponToList(coupons, newCoupon));
-      onSuccess("쿠폰이 추가되었습니다.");
+    (newCoupon: Omit<Coupon, "name"> & { name: string }) => {
+      if (onSuccess) {
+        addCouponAction({ newCoupon, onSuccess });
+      } else {
+        addCouponAction({ newCoupon, onSuccess: () => {} });
+      }
     },
-    [coupons, onUpdateCoupons, onSuccess]
+    [addCouponAction, onSuccess]
   );
 
   const deleteCoupon = useCallback(
     (couponCode: string) => {
-      onUpdateCoupons(removeCouponFromList(coupons, couponCode));
-      onSuccess("쿠폰이 삭제되었습니다.");
+      if (onSuccess) {
+        deleteCouponAction({ couponCode, onSuccess });
+      } else {
+        deleteCouponAction({ couponCode, onSuccess: () => {} });
+      }
     },
-    [coupons, onUpdateCoupons, onSuccess]
+    [deleteCouponAction, onSuccess]
   );
 
   const applyCoupon = useCallback(
     (coupon: Coupon) => {
-      const currentTotal = calculateCartTotal(
-        cart,
-        selectedCoupon
-      ).totalAfterDiscount;
-
-      const validation = validateCouponApplication(currentTotal, coupon);
-
-      if (!validation.valid) {
-        onError(validation.message!);
-        return;
-      }
-
-      setSelectedCoupon(coupon);
-      onSuccess("쿠폰이 적용되었습니다.");
+      applyCouponAction(coupon);
     },
-    [cart, selectedCoupon, onSuccess, onError]
+    [applyCouponAction]
   );
 
+  const clearSelectedCoupon = useCallback(() => {
+    clearSelectedCouponAction();
+  }, [clearSelectedCouponAction]);
+
   return {
+    coupons,
+    setCoupons,
+    selectedCoupon,
+    setSelectedCoupon,
+
     couponForm,
     setCouponForm,
     showCouponForm,
     setShowCouponForm,
+
+    addCouponAction,
+    deleteCouponAction,
+    applyCouponAction,
+    clearSelectedCouponAction,
+
     addCoupon,
     deleteCoupon,
-    selectedCoupon,
-    setSelectedCoupon,
     applyCoupon,
+    clearSelectedCoupon,
   };
 };
