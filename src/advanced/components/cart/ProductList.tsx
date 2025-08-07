@@ -1,11 +1,11 @@
 import { Product } from "../../../types";
-import { ProductWithUI, formatPriceForUser } from "../../models/product";
+import { formatPriceForUser } from "../../models/product";
 import { ImageIcon } from "../icons";
 import { getStockStatus } from "../../utils/validators";
+import { useAtom } from "jotai";
+import { productsAtom } from "../../atoms/appAtoms";
 
 interface ProductListProps {
-  products: ProductWithUI[];
-  filteredProducts: ProductWithUI[];
   debouncedSearchTerm: string;
   addToCart: (
     product: Product,
@@ -18,14 +18,26 @@ interface ProductListProps {
 }
 
 export const ProductList = ({
-  products,
-  filteredProducts,
   debouncedSearchTerm,
   addToCart,
   onSuccess,
   onError,
   getStockForProduct,
 }: ProductListProps) => {
+  const [products] = useAtom(productsAtom);
+
+  const filteredProducts = debouncedSearchTerm
+    ? products.filter(
+        (product) =>
+          product.name
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          (product.description &&
+            product.description
+              .toLowerCase()
+              .includes(debouncedSearchTerm.toLowerCase()))
+      )
+    : products;
   return (
     <section>
       <div className="mb-6 flex justify-between items-center">

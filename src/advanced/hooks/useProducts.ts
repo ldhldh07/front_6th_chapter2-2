@@ -1,10 +1,9 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useAtom } from "jotai";
 import {
   ProductWithUI,
-  ProductFormData,
   createProduct,
   generateProductId,
-  createEmptyProductForm,
   createProductFormFromProduct,
 } from "../models/product";
 import {
@@ -12,23 +11,17 @@ import {
   addDiscountToList,
   removeDiscountFromList,
 } from "../models/discount";
-import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 import { percentToDecimal } from "../utils/formatters";
+import {
+  productsAtom,
+  productFormAtom,
+  editingProductAtom,
+} from "../atoms/appAtoms";
 
-export const useProducts = (
-  initialProducts: ProductWithUI[],
-  onSuccess: (message: string) => void
-) => {
-  const [products, setProducts] = useLocalStorage<ProductWithUI[]>(
-    "products",
-    initialProducts
-  );
-
-  const [productForm, setProductForm] = useState<ProductFormData>(
-    createEmptyProductForm()
-  );
-
-  const [editingProduct, setEditingProduct] = useState<string | null>(null);
+export const useProducts = (onSuccess: (message: string) => void) => {
+  const [_products, setProducts] = useAtom(productsAtom);
+  const [_productForm, setProductForm] = useAtom(productFormAtom);
+  const [_editingProduct, setEditingProduct] = useAtom(editingProductAtom);
 
   /**
    * 새 상품 추가
@@ -148,11 +141,6 @@ export const useProducts = (
   );
 
   return {
-    products,
-    productForm,
-    setProductForm,
-    editingProduct,
-    setEditingProduct,
     addProduct,
     updateProduct,
     deleteProduct,

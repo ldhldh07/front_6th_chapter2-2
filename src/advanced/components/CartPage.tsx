@@ -3,12 +3,10 @@ import { Product, CartItem, Coupon } from "../../types";
 import Cart from "./cart/Cart";
 import { calculateItemTotal } from "../models/cart";
 import { ProductList } from "./cart/ProductList";
-import { ProductWithUI } from "../models/product";
 import { useDebounce } from "../utils/hooks/useDebounce";
-import { searchTermAtom } from "../atoms/appAtoms";
+import { searchTermAtom, productsAtom } from "../atoms/appAtoms";
 
 interface CartPageProps {
-  products: ProductWithUI[];
   coupons: Coupon[];
   cart: CartItem[];
   selectedCoupon: Coupon | null;
@@ -40,7 +38,6 @@ interface CartPageProps {
 }
 
 export const CartPage = ({
-  products,
   coupons,
   cart,
   selectedCoupon,
@@ -59,25 +56,10 @@ export const CartPage = ({
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const totals = calculateTotal(cart, selectedCoupon);
 
-  const filteredProducts = debouncedSearchTerm
-    ? products.filter(
-        (product) =>
-          product.name
-            .toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase()) ||
-          (product.description &&
-            product.description
-              .toLowerCase()
-              .includes(debouncedSearchTerm.toLowerCase()))
-      )
-    : products;
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <div className="lg:col-span-3">
         <ProductList
-          products={products}
-          filteredProducts={filteredProducts}
           debouncedSearchTerm={debouncedSearchTerm}
           addToCart={addToCart}
           onSuccess={onSuccess}
@@ -101,7 +83,6 @@ export const CartPage = ({
             completeOrder={completeOrder}
             onSuccess={onSuccess}
             onError={onError}
-            products={products}
           />
         </div>
       </div>

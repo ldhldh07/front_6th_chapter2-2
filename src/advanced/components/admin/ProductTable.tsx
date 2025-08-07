@@ -1,17 +1,18 @@
+import { useAtom } from "jotai";
 import { ProductWithUI, formatPriceForAdmin } from "../../models/product";
 import { getStockStatus } from "../../utils/validators";
+import { productsAtom } from "../../atoms/appAtoms";
 
 interface ProductTableProps {
-  products: ProductWithUI[];
   startEditProduct: (product: ProductWithUI) => void;
   deleteProduct: (productId: string) => void;
 }
 
 export const ProductTable = ({
-  products,
   startEditProduct,
   deleteProduct,
 }: ProductTableProps) => {
+  const [products] = useAtom(productsAtom);
   return (
     <div className="overflow-x-auto">
       <table className="w-full">

@@ -58,11 +58,6 @@ const App = () => {
   });
 
   const {
-    products,
-    productForm,
-    setProductForm,
-    editingProduct,
-    setEditingProduct,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -71,7 +66,7 @@ const App = () => {
     handleDiscountRemove,
     handleDiscountQuantityChange,
     handleDiscountRateChange,
-  } = useProducts(initialProducts, onSuccess);
+  } = useProducts(onSuccess);
 
   return (
     <>
@@ -125,7 +120,6 @@ const App = () => {
       <main className="max-w-7xl mx-auto px-4 py-8">
         {isAdmin ? (
           <AdminPage
-            products={products}
             coupons={coupons}
             couponForm={couponForm}
             setCouponForm={setCouponForm}
@@ -135,10 +129,6 @@ const App = () => {
             deleteCoupon={deleteCoupon}
             onError={onError}
             emptyCouponForm={createEmptyCouponForm()}
-            productForm={productForm}
-            setProductForm={setProductForm}
-            editingProduct={editingProduct}
-            setEditingProduct={setEditingProduct}
             addProduct={addProduct}
             updateProduct={updateProduct}
             deleteProduct={deleteProduct}
@@ -150,7 +140,6 @@ const App = () => {
           />
         ) : (
           <CartPage
-            products={products}
             coupons={coupons}
             onSuccess={onSuccess}
             onError={onError}

@@ -1,6 +1,8 @@
 import { CartItem, Coupon, Product } from "../../../types";
 import { CloseIcon, ShoppingBagIcon } from "../icons";
 import { formatKoreanWon } from "../../utils/formatters";
+import { useAtom } from "jotai";
+import { productsAtom } from "../../atoms/appAtoms";
 
 interface CartProps {
   cart: CartItem[];
@@ -23,7 +25,6 @@ interface CartProps {
   completeOrder: (onSuccess: (message: string) => void) => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
-  products: Product[];
 }
 
 const Cart = ({
@@ -39,8 +40,9 @@ const Cart = ({
   completeOrder,
   onSuccess,
   onError,
-  products,
 }: CartProps) => {
+  const [products] = useAtom(productsAtom);
+
   const handleCouponSelectOnChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {

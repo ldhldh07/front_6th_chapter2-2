@@ -1,14 +1,12 @@
 import React from "react";
-import { ProductFormData } from "../../models/product";
+import { useAtom } from "jotai";
 import { CloseIcon } from ".././icons";
 import { useValidate } from "../../utils/hooks/useValidate";
 import { safeParseInt } from "../../utils/validators";
+import { productFormAtom, editingProductAtom } from "../../atoms/appAtoms";
 
 interface ProductFormProps {
   showProductForm: boolean;
-  editingProduct: string | null;
-  productForm: ProductFormData;
-  setProductForm: React.Dispatch<React.SetStateAction<ProductFormData>>;
   handleProductSubmit: (e: React.FormEvent) => void;
   onError: (message: string) => void;
   handleCancelClick: () => void;
@@ -20,9 +18,6 @@ interface ProductFormProps {
 
 export const ProductForm = ({
   showProductForm,
-  editingProduct,
-  productForm,
-  setProductForm,
   handleProductSubmit,
   onError,
   handleCancelClick,
@@ -31,6 +26,8 @@ export const ProductForm = ({
   handleDiscountQuantityChange,
   handleDiscountRateChange,
 }: ProductFormProps) => {
+  const [productForm, setProductForm] = useAtom(productFormAtom);
+  const [editingProduct] = useAtom(editingProductAtom);
   const { validatePrice, validateStock, filterNumericInput } = useValidate();
 
   if (!showProductForm) {

@@ -1,4 +1,11 @@
 import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+import {
+  ProductWithUI,
+  ProductFormData,
+  createEmptyProductForm,
+} from "../models/product";
+import { initialProducts } from "../constants";
 
 /**
  * 관리자 모드 상태
@@ -16,3 +23,21 @@ export const searchTermAtom = atom("");
  */
 export const createDebouncedAtom = <T>(initialValue: T) =>
   atom<T>(initialValue);
+
+/**
+ * 상품 목록 상태
+ */
+export const productsAtom = atomWithStorage<ProductWithUI[]>(
+  "products",
+  initialProducts
+);
+
+/**
+ * 상품 폼 상태
+ */
+export const productFormAtom = atom<ProductFormData>(createEmptyProductForm());
+
+/**
+ * 편집 중인 상품 ID
+ */
+export const editingProductAtom = atom<string | null>(null);
