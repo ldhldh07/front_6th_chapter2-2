@@ -1,5 +1,5 @@
-import { ProductWithUI, formatPriceForAdmin } from "../models/product";
-import { getStockStatus } from "../utils/validators";
+import { ProductWithUI, formatPriceForAdmin } from "../../models/product";
+import { getStockStatus } from "../../utils/validators";
 
 interface ProductTableProps {
   products: ProductWithUI[];

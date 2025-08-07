@@ -1,7 +1,7 @@
 import { Product, CartItem, Coupon } from "../../types";
-import Cart from "./Cart";
+import Cart from "./cart/Cart";
 import { calculateItemTotal } from "../models/cart";
-import { ProductList } from "./ProductList";
+import { ProductList } from "./cart/ProductList";
 import { ProductWithUI } from "../models/product";
 import { NotificationType } from "../App";
 

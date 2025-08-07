@@ -1,13 +1,13 @@
 import React from "react";
-import { NotificationType } from "../App";
-import { ProductFormData } from "../models/product";
-import { CloseIcon } from "./icons";
+import { NotificationType } from "../../App";
+import { ProductFormData } from "../../models/product";
+import { CloseIcon } from ".././icons";
 import {
   isValidPrice,
   isValidStock,
   safeParseInt,
   extractNumbers,
-} from "../utils/validators";
+} from "../../utils/validators";
 
 interface ProductFormProps {
   showProductForm: boolean;

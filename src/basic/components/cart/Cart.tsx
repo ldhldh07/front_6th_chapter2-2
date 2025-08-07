@@ -1,6 +1,6 @@
-import { CartItem, Coupon, Product } from "../../types";
-import { NotificationType } from "../App";
-import { CloseIcon, ShoppingBagIcon } from "./icons";
+import { CartItem, Coupon, Product } from "../../../types";
+import { NotificationType } from "../../App";
+import { CloseIcon, ShoppingBagIcon } from "../icons";
 
 interface CartProps {
   cart: CartItem[];

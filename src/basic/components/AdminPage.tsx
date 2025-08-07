@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Coupon } from "../../types";
 import { NotificationType } from "../App";
-import { ProductForm } from "./ProductForm";
-import { ProductTable } from "./ProductTable";
-import { CouponForm } from "./CouponForm";
-import { CouponList } from "./CouponList";
+import { CouponForm } from "./admin/CouponForm";
 import { ProductWithUI, ProductFormData } from "../models/product";
 import { CouponFormData } from "../models/coupon";
+import { ProductForm } from "./admin/ProductForm";
+import { ProductTable } from "./admin/ProductTable";
+import { CouponList } from "./admin/CouponList";
 
 interface AdminPageProps {
   products: ProductWithUI[];

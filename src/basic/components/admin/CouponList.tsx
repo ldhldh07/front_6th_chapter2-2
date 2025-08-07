@@ -1,6 +1,6 @@
 import React from "react";
-import { Coupon } from "../../types";
-import { TrashIcon, PlusIcon } from "./icons";
+import { Coupon } from "../../../types";
+import { TrashIcon, PlusIcon } from ".././icons";
 
 interface CouponListProps {
   coupons: Coupon[];

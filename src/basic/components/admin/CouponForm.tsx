@@ -1,16 +1,16 @@
 import React from "react";
-import { Coupon } from "../../types";
+import { Coupon } from "../../../types";
 import {
   CouponFormData,
   processCouponForm,
   resetCouponForm,
-} from "../models/coupon";
-import { NotificationType } from "../App";
+} from "../../models/coupon";
+import { NotificationType } from "../../App";
 import {
   isValidDiscountValue,
   safeParseInt,
   extractNumbers,
-} from "../utils/validators";
+} from "../../utils/validators";
 
 interface CouponFormProps {
   showCouponForm: boolean;

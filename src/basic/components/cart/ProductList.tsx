@@ -1,8 +1,8 @@
-import { Product } from "../../types";
-import { NotificationType } from "../App";
-import { ProductWithUI, formatPriceForUser } from "../models/product";
-import { ImageIcon } from "./icons";
-import { getStockStatus } from "../utils/validators";
+import { Product } from "../../../types";
+import { NotificationType } from "../../App";
+import { ProductWithUI, formatPriceForUser } from "../../models/product";
+import { ImageIcon } from "../icons";
+import { getStockStatus } from "../../utils/validators";
 
 interface ProductListProps {
   products: ProductWithUI[];
